@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  cower:
+    image: ichinichi/cower
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8080:8080"
+    build:
+      dockerfile: ./Cower/Dockerfile
