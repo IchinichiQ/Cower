@@ -11,19 +11,38 @@ on:
       - app/backend/**
 
 jobs:
-  build:
-
+  test:
+    name: Running tests
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+      
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+        
     - name: Restore dependencies
       run: dotnet restore ./app/backend
-    - name: Build
-      run: dotnet build ./app/backend --no-restore
+      
     - name: Test
       run: dotnet test ./app/backend --no-build --verbosity normal
+  build:
+    name: Building image
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore ./app/backend
+      
+    - name: Build
+      run: dotnet build ./app/backend --no-restore
