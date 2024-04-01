@@ -7,7 +7,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Cower/Cower.csproj", "Cower/"]
+COPY ["backend/Cower/Cower.csproj", "Cower/"]
 RUN dotnet restore "Cower/Cower.csproj"
 COPY . .
 WORKDIR "/src/Cower"
