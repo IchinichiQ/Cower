@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Cower")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c0388c77fe8c170e0ae97895b9b905d16fb48da")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+24357ed5cb597f3dec335e62a392c7fdbd5bdf96")]
 [assembly: System.Reflection.AssemblyProductAttribute("Cower")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Cower")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
