@@ -23,7 +23,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("/user/register")]
-    public RegisterResponseDTO Register(RegisterRequestDTO request)
+    public RegisterResponseDTO Register([FromBody] RegisterRequestDTO request)
     {
         var requestBl = new RegisterUserRequestBL(
             request.Email,
@@ -48,7 +48,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("/user/login")]
-    public LoginResponseDTO Login(LoginRequestDTO request)
+    public LoginResponseDTO Login([FromBody] LoginRequestDTO request)
     {
         var user = _userService.TryLogin(request.Email, request.Password);
 
