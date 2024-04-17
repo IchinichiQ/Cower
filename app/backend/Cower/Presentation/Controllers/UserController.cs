@@ -22,7 +22,7 @@ public class UserController : ControllerBase
         _jwtService = jwtService;
     }
 
-    [HttpPost("/user/register")]
+    [HttpPost("/api/user/register")]
     public RegisterResponseDTO Register([FromBody] RegisterRequestDTO request)
     {
         var requestBl = new RegisterUserRequestBL(
@@ -47,7 +47,7 @@ public class UserController : ControllerBase
             jwt);
     }
     
-    [HttpPost("/user/login")]
+    [HttpPost("/api/user/login")]
     public LoginResponseDTO Login([FromBody] LoginRequestDTO request)
     {
         var user = _userService.TryLogin(request.Email, request.Password);
@@ -65,7 +65,7 @@ public class UserController : ControllerBase
             jwt);
     }
     
-    [HttpGet("/user/me")]
+    [HttpGet("/api/user/me")]
     [Authorize]
     public UserInfoResponseDTO UserInfo()
     {
