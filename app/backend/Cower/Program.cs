@@ -1,9 +1,22 @@
+using System.Net;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.WebHost.UseKestrel(kestrel =>
+{
+    var pfxFilePath = "certificate.pfx";
+    var pfxPassword = Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD");
+
+    kestrel.Listen(IPAddress.Any, 8080, listenOptions => {
+        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+        listenOptions.UseHttps(pfxFilePath, pfxPassword);
+    });
+});
 
 var app = builder.Build();
 
