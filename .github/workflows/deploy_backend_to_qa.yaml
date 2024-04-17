@@ -62,7 +62,6 @@ jobs:
               -v /cower/data:/var/lib/postgresql/data \
               postgres
               docker image prune -f
-      steps:
         - name: Replacing backend container
           uses: appleboy/ssh-action@master
           with:
