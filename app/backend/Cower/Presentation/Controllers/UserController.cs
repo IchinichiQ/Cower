@@ -36,7 +36,14 @@ public class UserController : ControllerBase
 
         var jwt = _jwtService.GenerateJwt(user);
 
-        return new RegisterResponseDTO(user.Id, jwt);
+        return new RegisterResponseDTO(
+            user.Id,
+            user.Email,
+            user.Role.Name,
+            user.Name,
+            user.Surname,
+            user.Phone,
+            jwt);
     }
     
     [HttpPost("/user/login")]
@@ -46,7 +53,14 @@ public class UserController : ControllerBase
 
         var jwt = _jwtService.GenerateJwt(user);
 
-        return new LoginResponseDTO(user.Id, jwt);
+        return new LoginResponseDTO(
+            user.Id,
+            user.Email,
+            user.Role.Name,
+            user.Name,
+            user.Surname,
+            user.Phone,
+            jwt);
     }
     
     [HttpGet("/user/me")]
@@ -58,10 +72,10 @@ public class UserController : ControllerBase
 
         return new UserInfoResponseDTO(
             user.Id,
+            user.Email,
+            user.Role.Name,
             user.Name,
             user.Surname,
-            user.Email,
-            user.Phone,
-            user.Role.Name);
+            user.Phone);
     }
 }
