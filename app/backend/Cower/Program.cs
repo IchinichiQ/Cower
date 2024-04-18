@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy  =>
                       {
-                          policy.WithOrigins("https://185.233.187.57:8080");
+                          policy.WithOrigins("*");
                       });
 });
 
