@@ -36,7 +36,10 @@ export const Root = () => {
           defaultActiveBg: colors.dark,
           defaultBg: colors.dark,
           defaultColor: colors.darker,
-          defaultHoverBg: colors.dark
+          defaultHoverBg: colors.dark,
+          fontSize: 20,
+          fontWeight: 600,
+          paddingContentHorizontal: 25,
         },
         Popover: {
           colorBgElevated: colors.darker

@@ -25,7 +25,7 @@ const SignInForm = () => {
           }
         })
         .catch(e => {
-          setError(e.detail || e.message);
+          setError('Не удалось авторизоваться');
         });
     },
   });
