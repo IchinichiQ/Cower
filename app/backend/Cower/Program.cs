@@ -12,14 +12,15 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy  =>
-                      {
-                          policy.WithOrigins("*");
-                      });
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder.AllowAnyOrigin() // Разрешает запросы с любых источников
+                   .AllowAnyMethod() // Разрешает все методы HTTP
+                   .AllowAnyHeader(); // Разрешает все заголовки
+        });
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -81,7 +82,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors(); // Добавление использования CORS
+
 app.UseAuthentication();
 app.UseAuthorization();
 
