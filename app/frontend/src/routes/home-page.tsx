@@ -17,7 +17,6 @@ const Wrapper = styled('div')`
 
 const SidePanel = styled(Flex)`
   width: 300px;
-  height: 100%;
   border-right: 1px solid ${colors.grid};
   padding: 20px;
 `
