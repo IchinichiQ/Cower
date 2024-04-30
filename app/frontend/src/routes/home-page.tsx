@@ -71,7 +71,9 @@ export const HomePage = () => {
       timeFrom,
       timeTo,
       address,
-      date
+      date,
+      cost: 400,
+      status: 'не оплачен'
     });
     navigate('/checkout');
   }

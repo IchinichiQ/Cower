@@ -5,6 +5,7 @@ import axios from 'axios';
 import {useActions} from '@/redux/actions';
 import {baseUrl} from '@/api';
 import {ErrorText} from '@/styles/styles';
+import ym from "react-yandex-metrika";
 
 const SignInForm = () => {
   const [error, setError] = useState('');
@@ -23,6 +24,7 @@ const SignInForm = () => {
             setJwt(res.data.jwt);
             setError('');
           }
+          ym('97166984','reachGoal','register');
         })
         .catch(e => {
           setError('Не удалось авторизоваться');

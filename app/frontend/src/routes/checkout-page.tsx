@@ -4,6 +4,7 @@ import {ToHomeButton} from "@/components/ToHomeButton";
 import {useNavigate} from "react-router-dom";
 import {useActions} from "@/redux/actions";
 import {formatOrderTime} from "@/utils/formatOrderTime";
+import ym from "react-yandex-metrika";
 
 export const CheckoutPage = () => {
   const {order} = useAppSelector(state => state.order);
@@ -19,6 +20,7 @@ export const CheckoutPage = () => {
       status: 'оплачен',
       cost: 400,
     })
+    ym('97166984','reachGoal','create-order');
     navigate('/payment-result');
   }
   return (
