@@ -34,4 +34,4 @@
 Презентация [pptx](documentation/Презентация.pptx) [pdf](documentation/Презентация.pdf)
 
 [Видеопрезентация (2 аттестация)](https://youtu.be/67evfZUgtRQ)  
-Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.зва)
+Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.pdf)
