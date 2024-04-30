@@ -13,6 +13,7 @@ import {OrdersPage} from "@/routes/orders-page";
 import {ProfilePage} from "@/routes/profile-page";
 import {OrderPresentLayout} from "@/security/OrderPresentLayout";
 import {CheckoutPage} from "@/routes/checkout-page";
+import {PaymentResultPage} from "@/routes/payment-result-page";
 
 const router = createHashRouter([
   {
@@ -44,12 +45,15 @@ const router = createHashRouter([
             element: <HomePage/>
           },
           {
-            path: 'checkout',
             element: <OrderPresentLayout redirectPath='/home'/>,
             children: [
               {
-                index: true,
+                path: 'checkout',
                 element: <CheckoutPage/>
+              },
+              {
+                path: 'payment-result',
+                element: <PaymentResultPage/>
               },
             ]
           },
