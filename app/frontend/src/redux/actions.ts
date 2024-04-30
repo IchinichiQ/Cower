@@ -1,11 +1,13 @@
 import {bindActionCreators} from '@reduxjs/toolkit';
-import {useDispatch} from 'react-redux';
 import {userActions} from '@/redux/userSlice';
+import {orderActions} from "@/redux/orderSlice";
+import {useAppDispatch} from "@/redux/index";
 
 const actions = {
-  ...userActions
+  ...userActions,
+  ...orderActions,
 };
 
 export function useActions() {
-  return bindActionCreators(actions, useDispatch());
+  return bindActionCreators(actions, useAppDispatch());
 }
