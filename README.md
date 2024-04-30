@@ -21,6 +21,9 @@
 - Сопроводительное письмо 
   [docx](documentation/Сопроводительное_письмо.docx)
   [pdf](documentation/Сопроводительное_письмо.pdf)
+- Курсовой проект
+  [docx](documentation/Курсовой_проект.docx)
+  [pdf](documentation/Курсовой_проект.pdf)
   
 ### Метрики
 [Скриншоты метрик](metrics)
@@ -31,4 +34,4 @@
 Презентация [pptx](documentation/Презентация.pptx) [pdf](documentation/Презентация.pdf)
 
 [Видеопрезентация (2 аттестация)](https://youtu.be/67evfZUgtRQ)  
-Презентация [pptx](documentation/Second.pptx)
+Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.зва)
