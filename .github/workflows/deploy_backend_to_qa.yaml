@@ -1,6 +1,6 @@
 name: Deploy backend to QA
 
-on: workflow_dispatch
+on: [workflow_dispatch]
 
 jobs:
   build:
@@ -35,7 +35,26 @@ jobs:
         url: https://${{ vars.SERVER_HOSTNAME }}:${{ vars.APP_PORT }}
       needs: build
       steps:
-        - name: Replacing container
+        - name: Replacing DB container
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ vars.SERVER_HOSTNAME }}
+            username: ${{ secrets.SERVER_USERNAME }}
+            password: ${{ secrets.SERVER_PASSWORD }}
+            script: |
+              docker image pull postgres
+              docker container stop db
+              docker container prune -f
+              docker run -d \
+              --name db \
+              -e POSTGRES_USER='${{ secrets.DB_USER }}' \
+              -e POSTGRES_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+              -e POSTGRES_DB=cower \
+              -p 5432:5432 \
+              -v /cower/data:/var/lib/postgresql/data \
+              postgres
+              docker image prune -f
+        - name: Replacing backend container
           uses: appleboy/ssh-action@master
           with:
             host: ${{ vars.SERVER_HOSTNAME }}
@@ -45,5 +64,13 @@ jobs:
               docker image pull ichinichi/cower
               docker container stop cower
               docker container prune -f
-              docker run -d --name cower --restart unless-stopped -e ASPNETCORE_ENVIRONMENT='Development' -e CERTIFICATE_PASSWORD='${{ secrets.CERTIFICATE_PASSWORD }}' -p ${{ vars.APP_PORT }}:8080 ichinichi/cower
+              docker run -d \
+              --name cower \
+              --restart unless-stopped \
+              -e ASPNETCORE_ENVIRONMENT='Development' \
+              -e CERTIFICATE_PASSWORD='${{ secrets.CERTIFICATE_PASSWORD }}' \
+              -e JWT_KEY='${{ secrets.JWT_KEY }}' \
+              -e DB_CONNECTION_STRING='${{ secrets.DB_CONNECTION_STRING }}' \
+              -p ${{ vars.APP_PORT }}:8080 \
+              ichinichi/cower
               docker image prune -f

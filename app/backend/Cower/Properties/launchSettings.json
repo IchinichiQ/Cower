@@ -16,7 +16,10 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5233",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "JWT_KEY": "KMgGwSqLHeTcUzuWahJy6DrxnYpkE5Xtm72b39jV",
+        "CERTIFICATE_PASSWORD": "CowerSslPassword121",
+        "DB_CONNECTION_STRING": "Host=localhost;Port=5432;Database=cower;Username=cower;Password=cower_password"
       }
     },
     "https": {
