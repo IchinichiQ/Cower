@@ -11,6 +11,8 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {HomePage} from "@/routes/home-page";
 import {OrdersPage} from "@/routes/orders-page";
 import {ProfilePage} from "@/routes/profile-page";
+import {OrderPresentLayout} from "@/security/OrderPresentLayout";
+import {CheckoutPage} from "@/routes/checkout-page";
 
 const router = createHashRouter([
   {
@@ -40,6 +42,16 @@ const router = createHashRouter([
           {
             path: 'home',
             element: <HomePage/>
+          },
+          {
+            path: 'checkout',
+            element: <OrderPresentLayout redirectPath='/home'/>,
+            children: [
+              {
+                index: true,
+                element: <CheckoutPage/>
+              },
+            ]
           },
           {
             path: 'orders',
