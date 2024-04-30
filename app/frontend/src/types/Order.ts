@@ -4,4 +4,6 @@ export interface Order {
   timeTo: number;
   address: string;
   place: number;
+  cost: number;
+  status: string;
 }

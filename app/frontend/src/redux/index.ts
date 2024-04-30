@@ -4,10 +4,12 @@ import {persistReducer, persistStore} from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import {useDispatch, useSelector} from "react-redux";
 import {orderReducer} from "@/redux/orderSlice";
+import {ordersReducer} from "@/redux/ordersSlice";
 
 const rootReducer = combineReducers({
   user: userReducer,
   order: orderReducer,
+  orders: ordersReducer,
 });
 
 const persistConfig = {
