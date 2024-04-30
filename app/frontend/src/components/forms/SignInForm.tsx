@@ -24,7 +24,7 @@ const SignInForm = () => {
             setJwt(res.data.jwt);
             setError('');
           }
-          ym('97166984','reachGoal','register');
+          // ym('97166984','reachGoal','register');
         })
         .catch(e => {
           setError('Не удалось авторизоваться');

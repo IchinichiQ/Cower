@@ -20,7 +20,7 @@ export const CheckoutPage = () => {
       status: 'оплачен',
       cost: 400,
     })
-    ym('97166984','reachGoal','create-order');
+    // ym('97166984','reachGoal','create-order');
     navigate('/payment-result');
   }
   return (
