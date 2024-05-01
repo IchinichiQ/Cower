@@ -1,4 +1,4 @@
-name: Deploy to QA
+name: Deploy to Production
 
 on: [workflow_dispatch]
 
@@ -35,10 +35,10 @@ jobs:
           tags: ichinichi/cower_frontend:latest
 
   update_server:
-      name: Updating QA environment
+      name: Updating Production environment
       runs-on: ubuntu-latest
       environment: 
-        name: QA
+        name: Production
         url: https://${{ vars.SERVER_HOSTNAME }}:${{ vars.FRONTEND_PORT }}
       needs: build
       steps:
@@ -50,15 +50,15 @@ jobs:
             password: ${{ secrets.SERVER_PASSWORD }}
             script: |
               docker image pull postgres
-              docker container stop db_qa
+              docker container stop db_prod
               docker container prune -f
               docker run -d \
-              --name db_qa \
+              --name db_prod \
               -e POSTGRES_USER='${{ secrets.DB_USER }}' \
               -e POSTGRES_PASSWORD='${{ secrets.DB_PASSWORD }}' \
               -e POSTGRES_DB=cower \
               -p ${{ vars.DB_PORT }}:5432 \
-              -v /cower/data_qa:/var/lib/postgresql/data \
+              -v /cower/data_prod:/var/lib/postgresql/data \
               postgres
               docker image prune -f
         - name: Replacing backend container
@@ -69,12 +69,12 @@ jobs:
             password: ${{ secrets.SERVER_PASSWORD }}
             script: |
               docker image pull ichinichi/cower_backend
-              docker container stop cower_backend_qa
+              docker container stop cower_backend_prod
               docker container prune -f
               docker run -d \
-              --name cower_backend_qa \
+              --name cower_backend_prod \
               --restart unless-stopped \
-              -e ASPNETCORE_ENVIRONMENT='Development' \
+              -e ASPNETCORE_ENVIRONMENT='Production' \
               -e CERTIFICATE_PASSWORD='${{ secrets.CERTIFICATE_PASSWORD }}' \
               -e JWT_KEY='${{ secrets.JWT_KEY }}' \
               -e DB_CONNECTION_STRING='${{ secrets.DB_CONNECTION_STRING }}' \
@@ -89,10 +89,10 @@ jobs:
             password: ${{ secrets.SERVER_PASSWORD }}
             script: |
               docker image pull ichinichi/cower_frontend
-              docker container stop cower_frontend_qa
+              docker container stop cower_frontend_prod
               docker container prune -f
               docker run -d \
-              --name cower_frontend_qa \
+              --name cower_frontend_prod \
               --restart unless-stopped \
               -p ${{ vars.FRONTEND_PORT }}:80 \
               -v /etc/ssl/cower:/etc/ssl/cower \
