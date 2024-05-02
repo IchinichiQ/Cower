@@ -6,6 +6,8 @@ jobs:
   build:
     name: Building images
     runs-on: ubuntu-latest
+    environment: 
+        name: Production
     steps:
       - name: Checkout
         uses: actions/checkout@v2
