@@ -19,6 +19,7 @@ RUN npm run build
 FROM httpd:2.4
 
 # For debug
+ARG BACKEND_ADDRESS
 ENV VITE_BACKEND_ADDRESS=$BACKEND_ADDRESS
 
 # Move built project
