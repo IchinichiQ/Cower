@@ -18,5 +18,5 @@ RUN dotnet publish "Cower.sln" -c $BUILD_CONFIGURATION -o /app/publish /p:UseApp
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY certificate.pfx .
+COPY Cower/certificate.pfx .
 ENTRYPOINT ["dotnet", "Cower.dll"]
