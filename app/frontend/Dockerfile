@@ -18,6 +18,9 @@ RUN npm run build
 # Prepare apache
 FROM httpd:2.4
 
+# For debug
+ENV VITE_BACKEND_ADDRESS=$BACKEND_ADDRESS
+
 # Move built project
 RUN rm -rf /usr/local/apache2/htdocs
 COPY --from=build /app/dist /usr/local/apache2/htdocs
