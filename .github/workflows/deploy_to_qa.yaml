@@ -33,6 +33,8 @@ jobs:
           context: ./app/frontend
           push: true
           tags: ichinichi/cower_frontend:latest
+          build-args: |
+            BACKEND_ADDRESS=https://${{ vars.SERVER_HOSTNAME }}:${{ vars.BACKEND_PORT }}/api
 
   update_server:
       name: Updating QA environment
