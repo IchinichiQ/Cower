@@ -21,8 +21,17 @@
 - Сопроводительное письмо 
   [docx](documentation/Сопроводительное_письмо.docx)
   [pdf](documentation/Сопроводительное_письмо.pdf)
+- Курсовой проект
+  [docx](documentation/Курсовой_проект.docx)
+  [pdf](documentation/Курсовой_проект.pdf)
+  
+### Метрики
+[Скриншоты метрик](metrics)
 
 ## Презентации проекта
 
 [ТЗ видео (1 аттестация)](https://www.youtube.com/watch?v=h5_w42bOTcg)  
 Презентация [pptx](documentation/Презентация.pptx) [pdf](documentation/Презентация.pdf)
+
+[Видеопрезентация (2 аттестация)](https://youtu.be/67evfZUgtRQ)  
+Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.pdf)
