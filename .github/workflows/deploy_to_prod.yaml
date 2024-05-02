@@ -23,7 +23,7 @@ jobs:
       - name: Build and push backend
         uses: docker/build-push-action@v5
         with:
-          context: ./app/backend/Cower
+          context: ./app/backend
           push: true
           tags: ichinichi/cower_backend:latest
 
