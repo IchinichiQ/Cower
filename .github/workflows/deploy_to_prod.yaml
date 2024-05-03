@@ -79,6 +79,7 @@ jobs:
               -e ASPNETCORE_ENVIRONMENT='Production' \
               -e CERTIFICATE_PASSWORD='${{ secrets.CERTIFICATE_PASSWORD }}' \
               -e JWT_KEY='${{ secrets.JWT_KEY }}' \
+              -e PASSWORD_SALT='${{ secrets.PASSWORD_SALT }}' \
               -e DB_CONNECTION_STRING='${{ secrets.DB_CONNECTION_STRING }}' \
               -p ${{ vars.BACKEND_PORT }}:8080 \
               ichinichi/cower_backend
