@@ -11,14 +11,14 @@ jobs:
       docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
   update_server:
-      name: Updating Production environment
+      name: Update Production environment
       runs-on: ubuntu-latest
       environment: 
         name: Production
         url: https://${{ vars.SERVER_HOSTNAME }}:${{ vars.FRONTEND_PORT }}
       needs: build_and_push
       steps:
-        - name: Replacing DB container
+        - name: Replace DB container
           uses: appleboy/ssh-action@master
           with:
             host: ${{ vars.SERVER_HOSTNAME }}
@@ -37,7 +37,7 @@ jobs:
               -v /cower/data_prod:/var/lib/postgresql/data \
               postgres
               docker image prune -f
-        - name: Replacing backend container
+        - name: Replace backend container
           uses: appleboy/ssh-action@master
           with:
             host: ${{ vars.SERVER_HOSTNAME }}
@@ -58,7 +58,7 @@ jobs:
               -p ${{ vars.BACKEND_PORT }}:8080 \
               ichinichi/cower_backend
               docker image prune -f
-        - name: Replacing frontend container
+        - name: Replace frontend container
           uses: appleboy/ssh-action@master
           with:
             host: ${{ vars.SERVER_HOSTNAME }}
