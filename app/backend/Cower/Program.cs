@@ -74,7 +74,7 @@ builder.Services.AddSingleton<IJwtService, JwtService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (true)
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
