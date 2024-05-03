@@ -4,8 +4,9 @@ on: [workflow_dispatch, push]
 
 jobs:
   build_and_push:
+    name: Build and push Docker images
     uses: ./.github/workflows/build_and_push.yaml
-    with:
+    secrets:
       docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
       docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
