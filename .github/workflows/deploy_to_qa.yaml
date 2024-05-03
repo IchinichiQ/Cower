@@ -34,7 +34,7 @@ jobs:
           push: true
           tags: ichinichi/cower_frontend:latest
           build-args: |
-            BACKEND_ADDRESS=https://${{ vars.SERVER_HOSTNAME }}:${{ vars.BACKEND_PORT }}/api
+            BACKEND_ADDRESS=https://replace_me_in_container
 
   update_server:
       name: Updating QA environment
