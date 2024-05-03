@@ -3,38 +3,11 @@ name: Deploy to Production
 on: [workflow_dispatch]
 
 jobs:
-  build:
-    name: Building images
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3
-        
-      - name: DockerHub login
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          
-      - name: Build and push backend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./app/backend
-          push: true
-          tags: ichinichi/cower_backend:latest
-
-      - name: Build and push frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./app/frontend
-          push: true
-          tags: ichinichi/cower_frontend:latest
-          build-args: |
-            BACKEND_ADDRESS=https://replace_me_in_container
+  build_and_push:
+    uses: ./.github/workflows/build_and_push.yml@master
+    with:
+      docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
   update_server:
       name: Updating Production environment
@@ -42,7 +15,7 @@ jobs:
       environment: 
         name: Production
         url: https://${{ vars.SERVER_HOSTNAME }}:${{ vars.FRONTEND_PORT }}
-      needs: build
+      needs: build_and_push
       steps:
         - name: Replacing DB container
           uses: appleboy/ssh-action@master
