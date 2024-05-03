@@ -37,7 +37,7 @@ RUN { \
 
 RUN { \
     echo '#!/bin/sh';  \
-    echo 'sed -i "s|https://replace_me_in_container|$BACKEND_ADDRESS|g" /usr/local/apache2/htdocs/*'; \
+    echo 'grep -rl https://replace_me_in_container /usr/local/apache2/htdocs/ | xargs sed -i "s|https://replace_me_in_container|$BACKEND_ADDRESS|g"'; \
     echo 'httpd-foreground'; \
 } > /usr/local/apache2/start
 RUN chmod +x /usr/local/apache2/start
