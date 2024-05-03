@@ -1,6 +1,6 @@
 name: Deploy to Production
 
-on: [workflow_dispatch]
+on: [workflow_dispatch, push]
 
 jobs:
   build:
