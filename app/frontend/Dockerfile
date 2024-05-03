@@ -34,3 +34,12 @@ RUN { \
     echo "SSLCertificateKeyFile    /etc/ssl/cower/private.key"; \
     echo "SSLCertificateChainFile  /etc/ssl/cower/ca_bundle.crt"; \
 } | tee -a /usr/local/apache2/conf/httpd.conf
+
+RUN { \
+    echo '#!/bin/sh'  \
+    echo 'sed -i "s|https://replace_me_in_container|$BACKEND_ADDRESS|g" /usr/local/apache2/htdocs/*' \
+    echo 'httpd-foreground' >> /usr/local/apache2/start \
+} > /usr/local/apache2/start
+RUN chmod +x /usr/local/apache2/start
+
+ENTRYPOINT ["/usr/local/apache2/start"]
