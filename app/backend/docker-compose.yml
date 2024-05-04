@@ -2,10 +2,23 @@ version: '3.8'
 
 services:
   cower:
-    image: ichinichi/cower
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - CERTIFICATE_PASSWORD=${secrets:CERTIFICATE_PASSWORD}
+      - JWT_KEY=${secrets:JWT_KEY}
+      - DB_CONNECTION_STRING=${secrets:DB_CONNECTION_STRING}
     ports:
       - "8080:8080"
     build:
-      dockerfile: ./Cower/Dockerfile
+      context: ./Cower
+      dockerfile: Dockerfile
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${secrets:DB_USER}
+      POSTGRES_PASSWORD: ${secrets:DB_PASSWORD}
+      POSTGRES_DB: cower
+    ports:
+      - "5432:5432"
+    volumes:
+      - /cower/data:/var/lib/postgresql/data
