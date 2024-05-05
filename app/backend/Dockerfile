@@ -19,4 +19,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY Cower.Web/certificate.pfx .
-ENTRYPOINT ["dotnet", "Cower.dll"]
+ENTRYPOINT ["dotnet", "Cower.Web.dll"]
