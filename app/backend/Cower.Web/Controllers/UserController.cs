@@ -1,10 +1,10 @@
-using Cower.Presentation.Models;
-using Cower.Service;
 using Cower.Service.Models;
+using Cower.Service.Services;
+using Cower.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Cower.Presentation.Controllers;
+namespace Cower.Web.Controllers;
 
 public class UserController : ControllerBase
 {

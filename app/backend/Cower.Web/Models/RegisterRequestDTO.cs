@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace Cower.Presentation.Models;
+namespace Cower.Web.Models;
 
 public class RegisterRequestDTO
 {

@@ -1,5 +1,3 @@
-using Cower.Data.Models;
-
 namespace Cower.Service.Models;
 
 public record RegisterUserRequestBL(

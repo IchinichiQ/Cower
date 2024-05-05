@@ -2,8 +2,9 @@ using System.Text;
 using Cower.Data.Models;
 using Cower.Data.Repositories;
 using Cower.Service.Models;
+using Microsoft.Extensions.Logging;
 
-namespace Cower.Service.Implementation;
+namespace Cower.Service.Services.Implementation;
 
 public class UserService : IUserService
 {

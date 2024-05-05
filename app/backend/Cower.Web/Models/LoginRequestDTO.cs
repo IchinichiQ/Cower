@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Cower.Presentation.Models;
+namespace Cower.Web.Models;
 
 public class LoginRequestDTO
 {

@@ -1,10 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Cower.Common;
+using Cower.Common.JWT;
 using Cower.Data.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Cower.Service.Implementation;
+namespace Cower.Service.Services.Implementation;
 
 public class JwtService : IJwtService
 {

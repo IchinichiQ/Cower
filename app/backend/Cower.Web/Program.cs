@@ -1,10 +1,12 @@
 using System.Net;
 using Cower.Common;
+using Cower.Common.JWT;
 using Cower.Data.Repositories;
 using Cower.Data.Repositories.Implementation;
-using Cower.Presentation;
 using Cower.Service;
-using Cower.Service.Implementation;
+using Cower.Service.Services;
+using Cower.Service.Services.Implementation;
+using Cower.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.IdentityModel.Tokens;

@@ -1,9 +1,9 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Cower.Common;
+namespace Cower.Common.JWT;
 
-public class AuthOptions
+public static class AuthOptions
 {
     public const string ISSUER = "Cower";
     public const string AUDIENCE = "CowerUser";

@@ -1,4 +1,4 @@
-namespace Cower.Presentation.Models;
+namespace Cower.Web.Models;
 
 public record UserResponseDTO(
     long Id,

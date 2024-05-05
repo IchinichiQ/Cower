@@ -1,6 +1,6 @@
 using Cower.Data.Models;
 
-namespace Cower.Service;
+namespace Cower.Service.Services;
 
 public interface IJwtService
 {

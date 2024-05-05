@@ -1,7 +1,7 @@
 using Cower.Data.Models;
 using Cower.Service.Models;
 
-namespace Cower.Service;
+namespace Cower.Service.Services;
 
 public interface IUserService
 {
