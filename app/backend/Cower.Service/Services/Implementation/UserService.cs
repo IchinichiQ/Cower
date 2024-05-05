@@ -28,7 +28,7 @@ public class UserService : IUserService
             Email = requestBl.Email,
             PasswordHash = Encoding.UTF8.GetBytes(requestBl.Password),
             Phone = requestBl.Phone,
-            RoleId = 2
+            RoleId = AppRoles.User.Id
         };
         
         return _userRepository.AddUser(user).ToUser();
