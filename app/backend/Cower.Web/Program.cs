@@ -1,9 +1,7 @@
 using System.Net;
-using Cower.Common;
-using Cower.Common.JWT;
 using Cower.Data.Repositories;
 using Cower.Data.Repositories.Implementation;
-using Cower.Service;
+using Cower.Domain.JWT;
 using Cower.Service.Services;
 using Cower.Service.Services.Implementation;
 using Cower.Web;

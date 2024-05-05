@@ -1,6 +1,8 @@
 using System.Text;
-using Cower.Data.Models;
+using Cower.Data.Entities;
 using Cower.Data.Repositories;
+using Cower.Domain.Models;
+using Cower.Service.Extensions;
 using Cower.Service.Models;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +21,7 @@ public class UserService : IUserService
 
     public User RegisterUser(RegisterUserRequestBL requestBl)
     {
-        var user = new User
+        var user = new UserEntity
         {
             Name = requestBl.Name,
             Surname = requestBl.Surname,
@@ -28,19 +30,19 @@ public class UserService : IUserService
             Phone = requestBl.Phone,
             RoleId = 2
         };
-
-        return _userRepository.AddUser(user);
+        
+        return _userRepository.AddUser(user).ToUser();
     }
 
     public User? TryLogin(string email, string password)
     {
         var passwordHash = Encoding.UTF8.GetBytes(password);
 
-        return _userRepository.GetUserByCredentials(email, passwordHash);
+        return _userRepository.GetUserByCredentials(email, passwordHash)?.ToUser();
     }
 
     public User? GetUser(long id)
     {
-        return _userRepository.GetUser(id);
+        return _userRepository.GetUser(id)?.ToUser();
     }
 }

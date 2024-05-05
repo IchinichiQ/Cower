@@ -1,4 +1,5 @@
-using Cower.Data.Models;
+using Cower.Data.Entities;
+using Cower.Domain.Models;
 using Cower.Service.Models;
 
 namespace Cower.Service.Services;

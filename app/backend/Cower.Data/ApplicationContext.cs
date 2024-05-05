@@ -1,12 +1,12 @@
-using Cower.Data.Models;
+using Cower.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cower.Data;
 
 public sealed class ApplicationContext : DbContext
 {
-    public DbSet<User> Users { get; set; }
-    public DbSet<Role> Roles { get; set; }
+    public DbSet<UserEntity> Users { get; set; }
+    public DbSet<RoleEntity> Roles { get; set; }
     
     public ApplicationContext()
     {

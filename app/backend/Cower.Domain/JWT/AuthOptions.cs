@@ -1,7 +1,7 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Cower.Common.JWT;
+namespace Cower.Domain.JWT;
 
 public static class AuthOptions
 {

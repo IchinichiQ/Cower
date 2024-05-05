@@ -2,11 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cower.Web", "Cower.Web\Cower.Web.csproj", "{977818F0-42D7-4E55-8FCC-DFC923115F6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cower.Common", "Cower.Common\Cower.Common.csproj", "{DEA99D51-408E-4129-83FC-B8C1A296C9E0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cower.Data", "Cower.Data\Cower.Data.csproj", "{22E02008-FBFA-4ED7-A54C-24E56A2BD7EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cower.Service", "Cower.Service\Cower.Service.csproj", "{A324647D-D394-4A6F-A2A5-3C2E7281E5DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cower.Domain", "Cower.Domain\Cower.Domain.csproj", "{72D333A8-E9E8-4E4E-913E-D2E8E95C7357}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,10 +18,6 @@ Global
 		{977818F0-42D7-4E55-8FCC-DFC923115F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{977818F0-42D7-4E55-8FCC-DFC923115F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{977818F0-42D7-4E55-8FCC-DFC923115F6B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DEA99D51-408E-4129-83FC-B8C1A296C9E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DEA99D51-408E-4129-83FC-B8C1A296C9E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DEA99D51-408E-4129-83FC-B8C1A296C9E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DEA99D51-408E-4129-83FC-B8C1A296C9E0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{22E02008-FBFA-4ED7-A54C-24E56A2BD7EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{22E02008-FBFA-4ED7-A54C-24E56A2BD7EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22E02008-FBFA-4ED7-A54C-24E56A2BD7EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -30,5 +26,9 @@ Global
 		{A324647D-D394-4A6F-A2A5-3C2E7281E5DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A324647D-D394-4A6F-A2A5-3C2E7281E5DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A324647D-D394-4A6F-A2A5-3C2E7281E5DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72D333A8-E9E8-4E4E-913E-D2E8E95C7357}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72D333A8-E9E8-4E4E-913E-D2E8E95C7357}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72D333A8-E9E8-4E4E-913E-D2E8E95C7357}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72D333A8-E9E8-4E4E-913E-D2E8E95C7357}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

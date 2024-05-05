@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Cower.Data.Models;
+namespace Cower.Data.Entities;
 
 [Index(nameof(Email), IsUnique = true)]
-public class User
+public class UserEntity
 {
     public long Id { get; set; }
     public string Email { get; set; }
@@ -13,5 +13,5 @@ public class User
     public string? Phone { get; set; }
     public long RoleId { get; set; }
 
-    public Role Role { get; set; }
+    public RoleEntity Role { get; set; }
 }

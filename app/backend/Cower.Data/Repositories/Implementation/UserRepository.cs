@@ -1,4 +1,4 @@
-using Cower.Data.Models;
+using Cower.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -8,21 +8,21 @@ public class UserRepository : IUserRepository
 {
     private readonly ILogger<UserRepository> _logger;
     
-    public User? GetUser(long id)
+    public UserEntity? GetUser(long id)
     {
         using ApplicationContext db = new ApplicationContext();
 
         return db.Users.Include(x => x.Role).FirstOrDefault(x => x.Id == id);
     }
 
-    public User? GetUserByCredentials(string email, byte[] password)
+    public UserEntity? GetUserByCredentials(string email, byte[] password)
     {
         using ApplicationContext db = new ApplicationContext();
 
         return db.Users.Include(x => x.Role).FirstOrDefault(x => x.Email == email && x.PasswordHash == password);
     }
 
-    public User AddUser(User user)
+    public UserEntity AddUser(UserEntity user)
     {
         using ApplicationContext db = new ApplicationContext();
 

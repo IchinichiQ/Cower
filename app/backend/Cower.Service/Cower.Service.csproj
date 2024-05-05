@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cower.Common\Cower.Common.csproj" />
       <ProjectReference Include="..\Cower.Data\Cower.Data.csproj" />
+      <ProjectReference Include="..\Cower.Domain\Cower.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,7 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Cower.Common.JWT;
-using Cower.Data.Models;
+using Cower.Data.Entities;
+using Cower.Domain.JWT;
+using Cower.Domain.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
