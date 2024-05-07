@@ -47,8 +47,6 @@ public class UserService : IUserService
 
     public User? TryLogin(string email, string password)
     {
-        throw new InvalidCastException("wtf");
-        
         var passwordHash = Encoding.UTF8.GetBytes(password);
 
         return _userRepository.GetUserByCredentials(email, passwordHash)?.ToUser();
