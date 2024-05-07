@@ -1,5 +1,6 @@
 using Cower.Service.Models;
 using Cower.Service.Services;
+using Cower.Web.Helpers;
 using Cower.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,9 +49,22 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("/api/user/login")]
-    public LoginResponseDTO Login([FromBody] LoginRequestDTO request)
+    public ActionResult<LoginResponseDTO> Login([FromBody] LoginRequestDTO request)
     {
+        var validationError = ValidationHelper.Validate(request);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+        
         var user = _userService.TryLogin(request.Email, request.Password);
+        if (user == null)
+        {
+            var error = new ErrorDTO(
+                "invalid_credentials",
+                "Пользователя с таким логином и паролем не существует");
+            return BadRequest(error);
+        }
 
         var jwt = _jwtService.GenerateJwt(user);
 

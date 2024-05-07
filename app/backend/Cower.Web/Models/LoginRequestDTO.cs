@@ -4,8 +4,10 @@ namespace Cower.Web.Models;
 
 public class LoginRequestDTO
 {
-    [Required]
-    public string Email { get; set; }
-    [Required]
-    public string Password { get; set; }
+    [Required(ErrorMessage = "Email не указан")]
+    [EmailAddress(ErrorMessage = "Некорректный формат Email")]
+    public string Email { get; init; }
+
+    [Required(ErrorMessage = "Пароль не указан")]
+    public string Password { get; init; }
 }
