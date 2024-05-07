@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Cower.Web.Models;
@@ -16,6 +17,6 @@ public class RegisterRequestDTO
     
     public string? Surname { get; init; }
     
-    [RegularExpression(@"(?:\+|\d)[\d\-\(\) ]{9,}\d", ErrorMessage = "Некорректный формат номера телефона")]
+    [RegularExpression(@"^(8|\+7)[\- ]?(\(?\d{3}\)?[\- ]?)(\d[\- ]?){6}\d$", ErrorMessage = "Некорректный формат номера телефона")]
     public string? Phone { get; init; }
 }
