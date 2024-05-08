@@ -1,10 +1,14 @@
+using System.Data.SqlClient;
 using System.Text;
 using Cower.Data.Entities;
 using Cower.Data.Repositories;
 using Cower.Domain.Models;
+using Cower.Service.Exceptions;
 using Cower.Service.Extensions;
 using Cower.Service.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Cower.Service.Services.Implementation;
 
@@ -30,8 +34,15 @@ public class UserService : IUserService
             Phone = requestBl.Phone,
             RoleId = AppRoles.User.Id
         };
-        
-        return _userRepository.AddUser(user).ToUser();
+
+        try
+        {
+            return _userRepository.AddUser(user).ToUser();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
+        {
+            throw new EmailTakenException();
+        }
     }
 
     public User? TryLogin(string email, string password)
