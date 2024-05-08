@@ -11,7 +11,7 @@ public static class ValidationHelper
         {
             return new ErrorDTO(
                 "invalid_request_data",
-                new [] { "Некорректное тело запроса" });
+                "Некорректное тело запроса");
         }
         
         var validationResults = new List<ValidationResult>();
