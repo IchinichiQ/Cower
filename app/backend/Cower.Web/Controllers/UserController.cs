@@ -1,5 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+using Cower.Domain.Models;
+using Cower.Service.Exceptions;
 using Cower.Service.Models;
 using Cower.Service.Services;
+using Cower.Web.Helpers;
 using Cower.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,8 +27,14 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("/api/user/register")]
-    public RegisterResponseDTO Register([FromBody] RegisterRequestDTO request)
+    public ActionResult<RegisterResponseDTO> Register([FromBody] [Required] RegisterRequestDTO request)
     {
+        var validationError = ValidationHelper.Validate(request);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+        
         var requestBl = new RegisterUserRequestBL(
             request.Email,
             request.Password,
@@ -32,7 +42,19 @@ public class UserController : ControllerBase
             request.Surname,
             request.Phone);
 
-        var user = _userService.RegisterUser(requestBl);
+        User user;
+        try
+        {
+            user = _userService.RegisterUser(requestBl);
+        }
+        catch (EmailTakenException)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.EMAIL_ALREADY_TAKEN,
+                "Пользователь с такой почтой уже существует");
+            return BadRequest(error);
+        }
+        
 
         var jwt = _jwtService.GenerateJwt(user);
 
@@ -48,9 +70,22 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("/api/user/login")]
-    public LoginResponseDTO Login([FromBody] LoginRequestDTO request)
+    public ActionResult<LoginResponseDTO> Login([FromBody] LoginRequestDTO request)
     {
+        var validationError = ValidationHelper.Validate(request);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+        
         var user = _userService.TryLogin(request.Email, request.Password);
+        if (user == null)
+        {
+            var error = new ErrorDTO(
+                "invalid_credentials",
+                "Пользователя с таким логином и паролем не существует");
+            return BadRequest(error);
+        }
 
         var jwt = _jwtService.GenerateJwt(user);
 
