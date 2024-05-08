@@ -104,6 +104,8 @@ public class UserController : ControllerBase
     [Authorize]
     public UserInfoResponseDTO UserInfo()
     {
+        throw new ArgumentNullException("etf");
+        
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
         var user = _userService.GetUser(long.Parse(userId));
 

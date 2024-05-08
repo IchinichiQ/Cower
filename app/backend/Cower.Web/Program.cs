@@ -1,10 +1,13 @@
 using System.Net;
+using System.Security.Cryptography;
+using System.Text.Json;
 using Cower.Data.Repositories;
 using Cower.Data.Repositories.Implementation;
 using Cower.Domain.JWT;
 using Cower.Service.Services;
 using Cower.Service.Services.Implementation;
 using Cower.Web;
+using Cower.Web.StatusCodeHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.IdentityModel.Tokens;
@@ -72,6 +75,24 @@ builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(new ExceptionHandlerOptions 
+{
+    ExceptionHandler = ServerErrorHandler.Invoke
+});
+
+app.UseStatusCodePages(async context =>
+{
+    switch (context.HttpContext.Response.StatusCode)
+    {
+        case (int)HttpStatusCode.Unauthorized:
+            await UnauthorizedHandler.Invoke(context.HttpContext);
+            break;
+        case (int)HttpStatusCode.Forbidden:
+            await FordbiddenHandler.Invoke(context.HttpContext);
+            break;
+    }
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
