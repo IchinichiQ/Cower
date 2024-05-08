@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cower.Data.Entities;
@@ -13,5 +14,9 @@ public class UserEntity
     public string? Phone { get; set; }
     public long RoleId { get; set; }
 
+    [ForeignKey("RoleId")]
     public RoleEntity Role { get; set; }
+    
+    [InverseProperty("User")]
+    public ICollection<BookingEntity> Bookings { get; set; }
 }
