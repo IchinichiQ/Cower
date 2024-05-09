@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Cower.Data.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Cower.Data.Entities;
+namespace Cower.Data.Models.Entities;
 
 [Index(nameof(Email), IsUnique = true)]
 public class UserEntity

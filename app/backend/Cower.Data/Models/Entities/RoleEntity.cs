@@ -1,4 +1,4 @@
-namespace Cower.Data.Entities;
+namespace Cower.Data.Models.Entities;
 
 public class RoleEntity
 {

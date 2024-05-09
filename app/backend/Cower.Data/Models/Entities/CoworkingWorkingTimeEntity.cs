@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Cower.Data.Entities;
+namespace Cower.Data.Models.Entities;
 
-public class CoworkingFloorMediaEntity
+public class CoworkingWorkingTimeEntity
 {
     public long Id { get; set; }
-    public int Number { get; set; }
-    public string BackgroundFilename { get; set; } = default!;
+    public int DayOfWeek { get; set; }
+    public TimeOnly Open { get; set; }
+    public TimeOnly Close { get; set; }
     public long CoworkingId { get; set; }
     
     [ForeignKey("CoworkingId")]

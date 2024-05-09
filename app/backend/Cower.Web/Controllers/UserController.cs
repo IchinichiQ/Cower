@@ -26,8 +26,8 @@ public class UserController : ControllerBase
         _jwtService = jwtService;
     }
 
-    [HttpPost("/api/user/register")]
-    public ActionResult<RegisterResponseDTO> Register([FromBody] [Required] RegisterRequestDTO request)
+    [HttpPost("api/user/register")]
+    public async Task<ActionResult<RegisterResponseDTO>> Register([FromBody] [Required] RegisterRequestDTO request)
     {
         var validationError = ValidationHelper.Validate(request);
         if (validationError != null)
@@ -45,7 +45,7 @@ public class UserController : ControllerBase
         User user;
         try
         {
-            user = _userService.RegisterUser(requestBl);
+            user = await _userService.RegisterUser(requestBl);
         }
         catch (EmailTakenException)
         {
@@ -69,8 +69,8 @@ public class UserController : ControllerBase
             jwt);
     }
     
-    [HttpPost("/api/user/login")]
-    public ActionResult<LoginResponseDTO> Login([FromBody] LoginRequestDTO request)
+    [HttpPost("api/user/login")]
+    public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO request)
     {
         var validationError = ValidationHelper.Validate(request);
         if (validationError != null)
@@ -78,11 +78,11 @@ public class UserController : ControllerBase
             return BadRequest(validationError);
         }
         
-        var user = _userService.TryLogin(request.Email, request.Password);
+        var user = await _userService.TryLogin(request.Email, request.Password);
         if (user == null)
         {
             var error = new ErrorDTO(
-                "invalid_credentials",
+                ErrorCodes.INVALID_CREDENTIALS,
                 "Пользователя с таким логином и паролем не существует");
             return BadRequest(error);
         }
@@ -100,14 +100,12 @@ public class UserController : ControllerBase
             jwt);
     }
     
-    [HttpGet("/api/user/me")]
+    [HttpGet("api/user/me")]
     [Authorize]
-    public UserInfoResponseDTO UserInfo()
+    public async Task<UserInfoResponseDTO> UserInfo()
     {
-        throw new ArgumentNullException("etf");
-        
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
-        var user = _userService.GetUser(long.Parse(userId));
+        var user = await _userService.GetUser(long.Parse(userId));
 
         return new UserInfoResponseDTO(
             new UserResponseDTO(

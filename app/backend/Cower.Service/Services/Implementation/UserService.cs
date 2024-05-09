@@ -1,6 +1,6 @@
 using System.Data.SqlClient;
 using System.Text;
-using Cower.Data.Entities;
+using Cower.Data.Models.Entities;
 using Cower.Data.Repositories;
 using Cower.Domain.Models;
 using Cower.Service.Exceptions;
@@ -23,9 +23,9 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public User RegisterUser(RegisterUserRequestBL requestBl)
+    public async Task<User> RegisterUser(RegisterUserRequestBL requestBl)
     {
-        var user = new UserEntity
+        var userEntity = new UserEntity
         {
             Name = requestBl.Name,
             Surname = requestBl.Surname,
@@ -37,7 +37,8 @@ public class UserService : IUserService
 
         try
         {
-            return _userRepository.AddUser(user).ToUser();
+            await _userRepository.AddUser(userEntity);
+            return userEntity.ToUser();
         }
         catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
         {
@@ -45,15 +46,19 @@ public class UserService : IUserService
         }
     }
 
-    public User? TryLogin(string email, string password)
+    public async Task<User?> TryLogin(string email, string password)
     {
         var passwordHash = Encoding.UTF8.GetBytes(password);
 
-        return _userRepository.GetUserByCredentials(email, passwordHash)?.ToUser();
+        var userEntity = await _userRepository.GetUserByCredentials(email, passwordHash);
+        
+        return userEntity?.ToUser();
     }
 
-    public User? GetUser(long id)
+    public async Task<User?> GetUser(long id)
     {
-        return _userRepository.GetUser(id)?.ToUser();
+        var userEntity = await _userRepository.GetUser(id);
+        
+        return userEntity?.ToUser();
     }
 }
