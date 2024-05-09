@@ -1,14 +1,39 @@
 import {useState} from 'react';
-import {useFormik} from 'formik';
+import {FormikErrors, useFormik} from 'formik';
 import {Button, Flex, Input} from 'antd';
 import axios from 'axios';
 import {useActions} from '@/redux/actions';
 import {baseUrl} from '@/api';
 import {ErrorText} from "@/styles/styles";
 
+interface FormValues {
+  name: string;
+  surname: string;
+  phone: string;
+  email: string;
+  password: string;
+}
+
+const validate = (values: FormValues) => {
+  const errors: FormikErrors<FormValues> = {};
+
+  if (!values.email.length) {
+    errors.email = 'Поле обязательно';
+  }
+
+  if (!values.password.length) {
+    errors.password = 'Поле обязательно';
+  } else if (values.password.length < 8) {
+    errors.password = 'Пароль должен содержать минимум 8 символов';
+  }
+
+  return errors;
+}
+
 const SignUpForm = () => {
+  const [errors, setErrors] = useState<string[]>([]);
   const {setUser, setJwt} = useActions();
-  const [error, setError] = useState('');
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -18,15 +43,24 @@ const SignUpForm = () => {
       email: '',
       password: ''
     },
+    validate(values) {
+      setSubmitAttempted(true);
+      return validate(values);
+    },
+    validateOnChange: submitAttempted,
     onSubmit(values) {
       axios.post(baseUrl + '/user/register', values)
         .then(res => {
           setUser(res.data.user);
           setJwt(res.data.jwt);
-          setError('');
+          setErrors([]);
         })
         .catch(e => {
-          setError('Не удалось авторизоваться');
+          if (e.response) {
+            setErrors(e.response.data.error.details);
+          } else {
+            setErrors(['Не удалось авторизоваться']);
+          }
         });
     },
   });
@@ -73,6 +107,7 @@ const SignUpForm = () => {
             name="email"
             type="text"
           />
+           <ErrorText>{formik.errors.email}</ErrorText>
         </div>
         <div>
           <label htmlFor="password">Пароль:</label>
@@ -83,9 +118,12 @@ const SignUpForm = () => {
             name="password"
             type="password"
           />
+          <ErrorText>{formik.errors.password}</ErrorText>
         </div>
         <Button htmlType="submit">Зарегистрироваться</Button>
-        <ErrorText>{error}</ErrorText>
+        {errors.map((error, index) =>
+          <ErrorText key={index}>{error}</ErrorText>
+        )}
       </Flex>
     </form>
   );
