@@ -7,29 +7,38 @@ namespace Cower.Data.Repositories.Implementation;
 public class UserRepository : IUserRepository
 {
     private readonly ILogger<UserRepository> _logger;
-    
-    public UserEntity? GetUser(long id)
-    {
-        using ApplicationContext db = new ApplicationContext();
+    private readonly ApplicationContext _db;
 
-        return db.Users.Include(x => x.Role).FirstOrDefault(x => x.Id == id);
+    public UserRepository(
+        ILogger<UserRepository> logger,
+        ApplicationContext db)
+    {
+        _logger = logger;
+        _db = db;
     }
 
-    public UserEntity? GetUserByCredentials(string email, byte[] password)
+    public async Task<UserEntity?> GetUser(long id)
     {
-        using ApplicationContext db = new ApplicationContext();
-
-        return db.Users.Include(x => x.Role).FirstOrDefault(x => x.Email == email && x.PasswordHash == password);
+        return await _db.Users
+            .Include(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public UserEntity AddUser(UserEntity user)
+    public async Task<UserEntity?> GetUserByCredentials(string email, byte[] password)
     {
-        using ApplicationContext db = new ApplicationContext();
+        return await _db.Users
+            .Include(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Email == email && x.PasswordHash == password);
+    }
 
-        db.Users.Add(user);
-        db.SaveChanges();
+    public async Task<UserEntity> AddUser(UserEntity user)
+    {
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
         
-        db.Entry(user).Reference(u => u.Role).Load();
+        await _db.Entry(user)
+            .Reference(u => u.Role)
+            .LoadAsync();
         
         return user;
     }
