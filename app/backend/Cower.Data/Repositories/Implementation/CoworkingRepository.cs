@@ -1,5 +1,6 @@
 using Cower.Data.Models;
 using Cower.Data.Models.Entities;
+using Cower.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

@@ -43,7 +43,7 @@ public class CoworkingController : ControllerBase
                 }).ToArray()
         };
     }
-    
+
     [HttpGet("api/coworking/{id}/floor/{num}")]
     public async Task<ActionResult<CoworkingFloorResponseDTO>> GetCoworkingFloor([FromRoute] long id, [FromRoute] int num)
     {
