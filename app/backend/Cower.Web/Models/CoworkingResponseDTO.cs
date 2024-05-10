@@ -5,7 +5,7 @@ namespace Cower.Web.Models;
 public sealed class CoworkingResponseDTO
 {
     [Required]
-    public long CoworkingId { get; init; }
+    public long Id { get; init; }
     [Required]
     public string Address { get; init; }
     [Required]

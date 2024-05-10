@@ -18,6 +18,29 @@ public class CoworkingController : ControllerBase
         _coworkingService = coworkingService;
     }
     
+    [HttpGet("api/coworking")]
+    public async Task<ActionResult<CoworkingsResponseDTO>> AllCoworkings()
+    {
+        var coworkings = await _coworkingService.GetAllCoworkings();
+
+        return new CoworkingsResponseDTO
+        {
+            Coworkings = coworkings.Select(x => new CoworkingResponseDTO
+            {
+                Id = x.Id,
+                Address = x.Address,
+                Floors = x.Floors,
+                WorkingTime = x.WorkingTime
+                    .Select(x => new CoworkingWorkingTimeResponseDTO
+                    {
+                        Day = x.Day.ToString(),
+                        Open = x.Open.ToString(),
+                        Close = x.Close.ToString()
+                    }).ToArray()
+            }).ToArray()
+        };
+    }
+    
     [HttpGet("api/coworking/{id}")]
     public async Task<ActionResult<CoworkingResponseDTO>> CoworkingInfo([FromRoute] long id)
     {
@@ -32,7 +55,7 @@ public class CoworkingController : ControllerBase
 
         return new CoworkingResponseDTO
         {
-            CoworkingId = coworking.Id,
+            Id = coworking.Id,
             Address = coworking.Address,
             Floors = coworking.Floors,
             WorkingTime = coworking.WorkingTime
@@ -44,7 +67,7 @@ public class CoworkingController : ControllerBase
                 }).ToArray()
         };
     }
-
+    
     [HttpGet("api/coworking/{id}/floor/{num}")]
     public async Task<ActionResult<CoworkingFloorResponseDTO>> GetCoworkingFloor([FromRoute] long id, [FromRoute] int num)
     {
