@@ -1,4 +1,4 @@
-using Cower.Data.Entities;
+using Cower.Data.Models.Entities;
 using Cower.Domain.Models;
 using Cower.Service.Models;
 

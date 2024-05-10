@@ -43,4 +43,43 @@ public class CoworkingController : ControllerBase
                 }).ToArray()
         };
     }
+
+    [HttpGet("api/coworking/{id}/floor/{num}")]
+    public async Task<ActionResult<CoworkingFloorResponseDTO>> GetCoworkingFloor([FromRoute] long id, [FromRoute] int num)
+    {
+        var floor = await _coworkingService.GetCoworkingFloor(id, num);
+        if (floor == null)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.NOT_FOUND,
+                "Такого коворкинга или этажа не существует");
+            return NotFound(error);
+        }
+
+        return new CoworkingFloorResponseDTO
+        {
+            CoworkingId = floor.CoworkingId,
+            Floor = floor.Floor,
+            BackgroundImage = floor.BackgroundFilename,
+            Seats = floor.Seats
+                .Select(x => new CoworkingSeatResponseDTO
+                {
+                    Id = x.Id,
+                    CoworkingId = x.CoworkingId,
+                    Floor = x.Floor,
+                    Number = x.Number,
+                    Price = x.Price,
+                    Description = x.Description,
+                    Image = x.ImageFilename,
+                    Position = new CoworkingSeatPositionResponseDTO
+                    {
+                        X = x.Position.X,
+                        Y = x.Position.Y,
+                        Width = x.Position.Width,
+                        Height = x.Position.Height,
+                        Angle = x.Position.Angle
+                    }
+                }).ToArray()
+        };
+    }
 }

@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Cower.Data.Entities;
+using Cower.Data.Models.Entities;
 using Cower.Domain.JWT;
 using Cower.Domain.Models;
 using Microsoft.Extensions.Logging;

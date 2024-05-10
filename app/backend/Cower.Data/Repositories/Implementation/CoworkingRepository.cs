@@ -1,3 +1,5 @@
+using Cower.Data.Models;
+using Cower.Data.Models.Entities;
 using Cower.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,5 +24,24 @@ public class CoworkingRepository : ICoworkingRepository
         return await _db.Coworkings
             .Include(x => x.WorkingTimes)
             .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<CoworkingFloorDAL?> GetCoworkingFloor(long coworkingId, int floorNum)
+    {
+        var floor = await _db.CoworkingFloorsMedia.FirstOrDefaultAsync(
+            x => x.CoworkingId == coworkingId && x.Number == floorNum);
+
+        if (floor == null)
+        {
+            return null;
+        }
+
+        var seats = await _db.CoworkingSeats
+            .Where(x => x.CoworkingId == coworkingId && x.Floor == floorNum)
+            .ToArrayAsync();
+
+        return new CoworkingFloorDAL(
+            floor,
+            seats);
     }
 }

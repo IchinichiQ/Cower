@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Cower.Data.Entities;
+namespace Cower.Data.Models.Entities;
 
 public class CoworkingSeatEntity
 {

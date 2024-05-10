@@ -1,4 +1,5 @@
-using Cower.Data.Entities;
+using Cower.Data.Models.Entities;
+using Cower.Data.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cower.Data;
@@ -12,11 +13,6 @@ public sealed class ApplicationContext : DbContext
     public DbSet<CoworkingSeatEntity> CoworkingSeats { get; set; }
     public DbSet<CoworkingWorkingTimeEntity> CoworkingsWorkingTime { get; set; }
     public DbSet<CoworkingFloorMediaEntity> CoworkingFloorsMedia { get; set; }
-    
-    public ApplicationContext()
-    {
-        Database.EnsureCreated();
-    }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

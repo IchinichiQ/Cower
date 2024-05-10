@@ -24,4 +24,11 @@ public class CoworkingService : ICoworkingService
 
         return coworkingEntity?.ToCoworking();
     }
+
+    public async Task<CoworkingFloor?> GetCoworkingFloor(long coworkingId, int floorNum)
+    {
+        var floorDal = await _coworkingRepository.GetCoworkingFloor(coworkingId, floorNum);
+
+        return floorDal?.ToCoworkingFloor();
+    }
 }

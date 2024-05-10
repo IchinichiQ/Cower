@@ -1,6 +1,6 @@
 using System.Data.SqlClient;
 using System.Text;
-using Cower.Data.Entities;
+using Cower.Data.Models.Entities;
 using Cower.Data.Repositories;
 using Cower.Domain.Models;
 using Cower.Service.Exceptions;
