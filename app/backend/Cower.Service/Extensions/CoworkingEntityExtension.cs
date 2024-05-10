@@ -1,5 +1,4 @@
 using Cower.Data.Models.Entities;
-using Cower.Data.Entities;
 using Cower.Domain.Models.Coworking;
 
 namespace Cower.Service.Extensions;

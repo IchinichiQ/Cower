@@ -1,4 +1,5 @@
 using Cower.Service.Services;
+using Cower.Web.Helpers;
 using Cower.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -80,6 +81,42 @@ public class CoworkingController : ControllerBase
                         Angle = x.Position.Angle
                     }
                 }).ToArray()
+        };
+    }
+    
+    [HttpGet("api/coworking/{id}/seat/availability")]
+    public async Task<ActionResult<CoworkingSeatAvailabiltiyResponseDTO>> GetSeatsAvailability(
+        [FromRoute] long id,
+        [FromQuery] CoworkingSeatAvailabilityRequestDTO requestDto)
+    {
+        var validationError = ValidationHelper.Validate(requestDto);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+
+        var availability = await _coworkingService.GetSeatsAvailability(
+            DateOnly.Parse(requestDto.Date),
+            id,
+            requestDto.SeatIds);
+        if (availability == null)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.NOT_FOUND,
+                "Такого коворкинга не существует");
+            return NotFound(error);
+        }
+        
+        return new CoworkingSeatAvailabiltiyResponseDTO
+        {
+            Date = availability.Date.ToString("yyyy-MM-dd"),
+            Availability = availability.Availability.ToDictionary(
+                x => x.Key,
+                x => x.Value.Select(x => new CoworkingSeatTimeSlotResponseDTO
+                {
+                    From = x.From.ToString(),
+                    To = x.To.ToString()
+                }).ToList())
         };
     }
 }

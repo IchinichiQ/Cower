@@ -8,6 +8,7 @@ public class BookingEntity
     public long UserId { get; set; }
     public long SeatId { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+    public DateOnly BookingDate { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
     public decimal Price { get; set; }
