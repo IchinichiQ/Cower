@@ -3,9 +3,9 @@ using Cower.Domain.Models;
 
 namespace Cower.Service.Extensions;
 
-public static class RoleEntityExt
+internal static class RoleEntityExt
 {
-    public static Role ToRole(this RoleEntity roleEntity)
+    internal static Role ToRole(this RoleEntity roleEntity)
     {
         return new Role(
             roleEntity.Name,

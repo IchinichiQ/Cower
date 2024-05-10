@@ -6,7 +6,7 @@ namespace Cower.Service.Services;
 
 public interface IUserService
 {
-    public User RegisterUser(RegisterUserRequestBL requestBl);
-    public User? TryLogin(string email, string password);
-    public User? GetUser(long id);
+    public Task<User> RegisterUser(RegisterUserRequestBL requestBl);
+    public Task<User?> TryLogin(string email, string password);
+    public Task<User?> GetUser(long id);
 }

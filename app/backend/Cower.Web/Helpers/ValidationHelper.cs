@@ -10,7 +10,7 @@ public static class ValidationHelper
         if (obj == null)
         {
             return new ErrorDTO(
-                "invalid_request_data",
+                ErrorCodes.INVALID_REQUEST_DATA,
                 "Некорректное тело запроса");
         }
         
@@ -32,7 +32,7 @@ public static class ValidationHelper
         if (errors.Any())
         {
             dto = new ErrorDTO(
-                "invalid_request_data",
+                ErrorCodes.INVALID_REQUEST_DATA,
                 errors);
         }
 

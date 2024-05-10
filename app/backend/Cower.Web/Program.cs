@@ -1,6 +1,7 @@
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Cower.Data;
 using Cower.Data.Repositories;
 using Cower.Data.Repositories.Implementation;
 using Cower.Domain.JWT;
@@ -70,9 +71,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddSingleton<IUserService, UserService>();
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddDbContext<ApplicationContext>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICoworkingService, CoworkingService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICoworkingRepository, CoworkingRepository>();
 
 var app = builder.Build();
 
