@@ -25,6 +25,13 @@ public class CoworkingRepository : ICoworkingRepository
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public async Task<IReadOnlyCollection<CoworkingEntity>> GetAllCoworkings()
+    {
+        return await _db.Coworkings
+            .Include(x => x.WorkingTimes)
+            .ToArrayAsync();
+    }
+
     public async Task<CoworkingFloorDAL?> GetCoworkingFloor(long coworkingId, int floorNum)
     {
         var floor = await _db.CoworkingFloorsMedia.FirstOrDefaultAsync(

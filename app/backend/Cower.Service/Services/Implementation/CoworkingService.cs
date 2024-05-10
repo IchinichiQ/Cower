@@ -30,6 +30,15 @@ public class CoworkingService : ICoworkingService
         return coworkingEntity?.ToCoworking();
     }
 
+    public async Task<IReadOnlyCollection<Coworking>> GetAllCoworkings()
+    {
+        var coworkingEntities = await _coworkingRepository.GetAllCoworkings();
+
+        return coworkingEntities
+            .Select(x => x.ToCoworking())
+            .ToArray();
+    }
+
     public async Task<CoworkingFloor?> GetCoworkingFloor(long coworkingId, int floorNum)
     {
         var floorDal = await _coworkingRepository.GetCoworkingFloor(coworkingId, floorNum);
