@@ -57,6 +57,7 @@ jobs:
               -e PASSWORD_SALT='${{ secrets.PASSWORD_SALT }}' \
               -e DB_CONNECTION_STRING='${{ secrets.DB_CONNECTION_STRING }}' \
               -e YOOMONEY_SECRET='${{ secrets.YOOMONEY_SECRET }}' \
+              -e YOOMONEY_RECEIVER='${{ secrets.YOOMONEY_RECEIVER }}' \
               -p ${{ vars.BACKEND_PORT }}:8080 \
               -v /cower/files:/cower/files \
               ichinichi/cower_backend
