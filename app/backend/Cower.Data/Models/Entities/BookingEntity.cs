@@ -22,4 +22,7 @@ public class BookingEntity
     
     [ForeignKey("UserId")]
     public UserEntity User { get; set; }
+    
+    [InverseProperty("Booking")]
+    public PaymentEntity Payment { get; set; }
 }

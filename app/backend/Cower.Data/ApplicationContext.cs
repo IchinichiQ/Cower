@@ -13,6 +13,7 @@ public sealed class ApplicationContext : DbContext
     public DbSet<CoworkingSeatEntity> CoworkingSeats { get; set; }
     public DbSet<CoworkingWorkingTimeEntity> CoworkingsWorkingTime { get; set; }
     public DbSet<CoworkingFloorMediaEntity> CoworkingFloorsMedia { get; set; }
+    public DbSet<PaymentEntity> Payments { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
