@@ -1,18 +1,22 @@
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Cower.Data;
 using Cower.Data.Repositories;
 using Cower.Data.Repositories.Implementation;
 using Cower.Domain.JWT;
+using Cower.Domain.Models.Booking;
 using Cower.Service.Services;
 using Cower.Service.Services.Implementation;
 using Cower.Web;
 using Cower.Web.StatusCodeHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +45,11 @@ builder.Services.AddSwaggerGen(c =>
     
     c.OperationFilter<AuthorizeCheckOperationFilter>();
 });
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(opts =>
+{
+    var enumConverter = new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower);
+    opts.JsonSerializerOptions.Converters.Add(enumConverter);
+});
 builder.WebHost.UseKestrel(kestrel =>
 {
     var pfxFilePath = "certificate.pfx";
@@ -71,10 +79,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddDbContext<ApplicationContext>();
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+var dbDataSource = new NpgsqlDataSourceBuilder(connectionString);
+dbDataSource.MapEnum<BookingStatus>();
+builder.Services.AddDbContext<ApplicationContext>(x => x
+    .UseNpgsql(dbDataSource.Build())
+    .UseSnakeCaseNamingConvention());
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICoworkingService, CoworkingService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
