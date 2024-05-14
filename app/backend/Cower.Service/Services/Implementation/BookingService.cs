@@ -23,9 +23,9 @@ public class BookingService : IBookingService
     public async Task<Booking?> GetBooking(long id, long userId)
     {
         var bookingDal = await _bookingRepository.GetBooking(id);
-        if (bookingDal?.UserId != userId)
+        if (bookingDal != null && bookingDal.UserId != userId)
         {
-            throw new BusinessLogicException("Unauthorized");
+            throw new ForbiddenException();
         }
         
         return bookingDal?.ToBooking();

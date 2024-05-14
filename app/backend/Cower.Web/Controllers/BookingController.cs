@@ -1,3 +1,5 @@
+using Cower.Domain.Models.Booking;
+using Cower.Service.Exceptions;
 using Cower.Service.Services;
 using Cower.Web.Extensions;
 using Cower.Web.Models;
@@ -25,8 +27,20 @@ public class BookingController : ControllerBase
     public async Task<ActionResult<BookingResponseDTO>> GetBooking([FromRoute] long id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+
+        Booking? booking;
+        try
+        {
+            booking = await _bookingService.GetBooking(id, long.Parse(userId));
+        }
+        catch (ForbiddenException)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.FORBIDDEN,
+                "Нет прав на просмотр этого бронирования");
+            return new ObjectResult(error) { StatusCode = 403};
+        }
         
-        var booking = await _bookingService.GetBooking(id, long.Parse(userId));
         if (booking == null)
         {
             var error = new ErrorDTO(
