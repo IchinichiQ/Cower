@@ -5,6 +5,7 @@ namespace Cower.Data.Models.Entities;
 
 public class BookingEntity
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
     public long UserId { get; set; }
     public long SeatId { get; set; }

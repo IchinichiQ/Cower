@@ -53,9 +53,26 @@ public class BookingRepository : IBookingRepository
 
     public async Task<BookingDAL> AddBooking(BookingDAL booking)
     {
-        _db.Bookings.Add(booking.ToBookingEntity());
+        var entity = booking.ToBookingEntity();
+        _db.Bookings.Add(entity);
         await _db.SaveChangesAsync();
         
-        return booking;
+        return entity.ToBookingDAL();
+    }
+
+    public async Task<bool> IsBookingTimeOverlaps(
+        long seatId,
+        DateOnly bookingDate,
+        TimeOnly startTime,
+        TimeOnly endTime)
+    {
+        return await _db.Bookings
+            .Where(x => x.SeatId == seatId &&
+                        x.BookingDate == bookingDate &&
+                        (startTime == x.StartTime ||
+                         endTime == x.EndTime ||
+                         (startTime > x.StartTime && startTime < x.EndTime) ||
+                         (endTime >= x.StartTime && endTime < x.EndTime)))
+            .AnyAsync();
     }
 }

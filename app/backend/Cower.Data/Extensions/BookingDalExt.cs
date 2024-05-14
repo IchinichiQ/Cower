@@ -9,8 +9,6 @@ public static class BookingDalExt
     {
         var paymentEntity = bookingDal.Payment != null ? new PaymentEntity
         {
-            Id = bookingDal.Payment.Id,
-            BookingId = bookingDal.Payment.BookingId,
             Label = bookingDal.Payment.Label,
             IsCompleted = bookingDal.Payment.IsCompleted,
             ExpireAt = bookingDal.Payment.ExpireAt
@@ -18,7 +16,6 @@ public static class BookingDalExt
 
         return new BookingEntity
         {
-            Id = bookingDal.Id,
             UserId = bookingDal.UserId,
             SeatId = bookingDal.SeatId,
             CreatedAt = bookingDal.CreatedAt,

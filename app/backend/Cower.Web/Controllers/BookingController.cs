@@ -1,7 +1,9 @@
 using Cower.Domain.Models.Booking;
 using Cower.Service.Exceptions;
+using Cower.Service.Models;
 using Cower.Service.Services;
 using Cower.Web.Extensions;
+using Cower.Web.Helpers;
 using Cower.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -67,6 +69,49 @@ public class BookingController : ControllerBase
             Bookings = bookings
                 .Select(x => x.ToBookingDTO())
                 .ToArray()
+        };
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult<CreateBookingResponseDTO>> CreateBooking([FromBody] CreateBookingRequestDTO request)
+    {
+        var validationError = ValidationHelper.Validate(request);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+        
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+
+        Booking booking;
+        try
+        {
+            booking = await _bookingService.AddBooking(new CreateBookingRequestBL(
+                long.Parse(userId),
+                request.SeatId,
+                DateOnly.Parse(request.BookingDate),
+                TimeOnly.Parse(request.StartTime),
+                TimeOnly.Parse(request.EndTime))
+            );
+        }
+        catch (NotFoundException)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.NOT_FOUND,
+                "Место с таким Id не найдено");
+            return NotFound(error);
+        }
+        catch (BusinessLogicException e)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.INVALID_REQUEST_DATA,
+                e.Message);
+            return BadRequest(error);
+        }
+
+        return new CreateBookingResponseDTO
+        {
+            Booking = booking.ToBookingDTO()
         };
     }
 }
