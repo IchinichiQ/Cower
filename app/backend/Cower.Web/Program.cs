@@ -80,10 +80,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-var dbDataSource = new NpgsqlDataSourceBuilder(connectionString);
+var dbDataSource = new NpgsqlDataSourceBuilder(connectionString).Build();
 dbDataSource.MapEnum<BookingStatus>();
 builder.Services.AddDbContext<ApplicationContext>(x => x
-    .UseNpgsql(dbDataSource.Build())
+    .UseNpgsql(dbDataSource)
     .UseSnakeCaseNamingConvention());
 
 builder.Services.AddScoped<IUserService, UserService>();
