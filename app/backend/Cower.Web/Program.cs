@@ -81,10 +81,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 var dbDataSource = new NpgsqlDataSourceBuilder(connectionString).Build();
-dbDataSource.MapEnum<BookingStatus>();
-builder.Services.AddDbContext<ApplicationContext>(x => x
-    .UseNpgsql(dbDataSource)
-    .UseSnakeCaseNamingConvention());
+builder.Services.AddDbContext<ApplicationContext>((options) => {
+    options.UseNpgsql(dbDataSource);
+    options.UseSnakeCaseNamingConvention();
+    options.MapEnum<BookingStatus>();
+});
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICoworkingService, CoworkingService>();
