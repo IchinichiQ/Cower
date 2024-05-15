@@ -11,6 +11,7 @@ internal static class BookingDalExt
             bookingDal.Payment.Id,
             bookingDal.Payment.BookingId,
             bookingDal.Payment.Label,
+            bookingDal.Payment.PaymentUrl,
             bookingDal.Payment.IsCompleted,
             bookingDal.Payment.ExpireAt) : null;
 

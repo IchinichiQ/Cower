@@ -14,17 +14,20 @@ public class BookingService : IBookingService
     private readonly IBookingRepository _bookingRepository;
     private readonly ISeatRepository _seatRepository;
     private readonly ICoworkingRepository _coworkingRepository;
+    private readonly IYoomoneyService _yoomoneyService;
 
     public BookingService(
         ILogger<BookingService> logger,
         IBookingRepository bookingRepository,
         ISeatRepository seatRepository,
-        ICoworkingRepository coworkingRepository)
+        ICoworkingRepository coworkingRepository,
+        IYoomoneyService yoomoneyService)
     {
         _logger = logger;
         _bookingRepository = bookingRepository;
         _seatRepository = seatRepository;
         _coworkingRepository = coworkingRepository;
+        _yoomoneyService = yoomoneyService;
     }
     
     public async Task<Booking?> GetBooking(long id, long userId)
@@ -72,15 +75,19 @@ public class BookingService : IBookingService
         {
             throw new BusinessLogicException("Время бронирования пересекается с другим бронированием");
         }
+
+        var bookingPrice = Math.Ceiling((int)(request.EndTime - request.StartTime).TotalMinutes * (seat.Price / 60m));
+        var label = Guid.NewGuid().ToString();
+        var paymentUrl = await _yoomoneyService.GetPaymentUrl(label, bookingPrice);
         
         var paymentDal = new PaymentDAL(
             -1,
             -1,
-            Guid.NewGuid().ToString(),
+            label,
+            paymentUrl,
             false,
             now.AddMinutes(10));
-        
-        var bookingPrice = Math.Ceiling((int)(request.EndTime - request.StartTime).TotalMinutes * (seat.Price / 60m));
+
         var bookingDal = new BookingDAL(
             -1,
             request.UserId,
@@ -93,13 +100,13 @@ public class BookingService : IBookingService
             bookingPrice,
             seat.Number,
             seat.Floor,
-            coworking!.Address,
+            coworking.Address,
             paymentDal);
 
         bookingDal = await _bookingRepository.AddBooking(bookingDal);
         return bookingDal.ToBooking();
     }
-
+    
     public async Task<Booking?> CancelBooking(long id, long userId)
     {
         var bookingDal = await _bookingRepository.GetBooking(id);
@@ -120,6 +127,25 @@ public class BookingService : IBookingService
         var cancelledBookingDal = await _bookingRepository.SetBookingStatus(id, BookingStatus.Cancelled);
 
         return cancelledBookingDal?.ToBooking();
+    }
+
+    public async Task<bool> ProcessPayment(string label, decimal amount)
+    {
+        var booking = await _bookingRepository.GetBooking(label);
+        if (booking == null)
+        {
+            return false;
+        }
+
+        var expectedPayment = _yoomoneyService.CalculateCommission(booking.Price);
+        if (amount < expectedPayment)
+        {
+            return false;
+        }
+
+        await _bookingRepository.SetBookingStatus(booking.Id, BookingStatus.Paid);
+        
+        return true;
     }
 
     private void ValidateCreateBookingRequest(CreateBookingRequestBL request)
