@@ -136,9 +136,8 @@ public class BookingService : IBookingService
         {
             return false;
         }
-
-        var expectedPayment = _yoomoneyService.CalculateCommission(booking.Price);
-        if (amount < expectedPayment)
+        
+        if (Math.Abs(amount - booking.Price) > 1m)
         {
             return false;
         }
