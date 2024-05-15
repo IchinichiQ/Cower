@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Cower.Service.Services;
 using Cower.Web.Extensions;
 using Cower.Web.Models;
@@ -25,6 +27,7 @@ public class YoomoneyController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> ProcessNotification([FromForm] YoomoneyNotificationRequestDto notification)
     {
+        _logger.LogInformation(JsonSerializer.Serialize(notification));
         if (!_yoomoneyService.ValidateNotification(notification.ToYoomoneyNotification()))
         {
             _logger.LogWarning("Invalid SHA-1 hash in YooMoney notification");

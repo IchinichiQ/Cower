@@ -77,6 +77,9 @@ public class YoomoneyService : IYoomoneyService
                       $"{notification.Codepro}&" +
                       $"{SECRET}&" +
                       $"{notification.Label}";
+
+        data =
+            "p2p-incoming&1234567&300.00&643&2011-07-01T09:00:00.000+04:00&41001XXXXXXXX&false&01234567890ABCDEF01234567890&YM.label.12345";
         
         byte[] dataBytes = Encoding.UTF8.GetBytes(data);
         byte[] hashBytes;
