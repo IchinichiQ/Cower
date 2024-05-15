@@ -18,8 +18,8 @@ public class YoomoneyService : IYoomoneyService
     public YoomoneyService(ILogger<YoomoneyService> logger)
     {
         _logger = logger;
-        
-        IS_DEVELOPMENT = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+        IS_DEVELOPMENT = false;
         // RECEIVER = Environment.GetEnvironmentVariable("YOOMONEY_RECEIVER")!;
         RECEIVER = "410012099835767";
         //SECRET = Environment.GetEnvironmentVariable("YOOMONEY_SECRET")!;
