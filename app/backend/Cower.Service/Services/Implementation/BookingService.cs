@@ -100,6 +100,28 @@ public class BookingService : IBookingService
         return bookingDal.ToBooking();
     }
 
+    public async Task<Booking?> CancelBooking(long id, long userId)
+    {
+        var bookingDal = await _bookingRepository.GetBooking(id);
+        if (bookingDal == null)
+        {
+            return null;
+        }
+        if (bookingDal.UserId != userId)
+        {
+            throw new ForbiddenException();
+        }
+
+        if (!bookingDal.Status.CanCancel())
+        {
+            throw new BusinessLogicException($"Нельзя отменить бронирование в статусе {bookingDal.Status}");
+        }
+
+        var cancelledBookingDal = await _bookingRepository.SetBookingStatus(id, BookingStatus.Cancelled);
+
+        return cancelledBookingDal?.ToBooking();
+    }
+
     private void ValidateCreateBookingRequest(CreateBookingRequestBL request)
     {
         var nowDate = DateOnly.FromDateTime(DateTimeOffset.Now.DateTime);

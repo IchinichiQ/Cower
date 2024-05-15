@@ -114,4 +114,43 @@ public class BookingController : ControllerBase
             Booking = booking.ToBookingDTO()
         };
     }
+    
+    [HttpPost("{id}/cancel")]
+    public async Task<ActionResult<CancelBookingResponseDTO>> CancelBooking([FromRoute] long id)
+    {
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+
+        Booking? booking;
+        try
+        {
+            booking = await _bookingService.CancelBooking(id, long.Parse(userId));
+        }
+        catch (ForbiddenException)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.FORBIDDEN,
+                "Нет прав на отмену этого бронирования");
+            return new ObjectResult(error) { StatusCode = 403};
+        }
+        catch (BusinessLogicException e)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.INVALID_REQUEST_DATA,
+                e.Message);
+            return BadRequest(error);
+        }
+
+        if (booking == null)
+        {
+            var error = new ErrorDTO(
+                ErrorCodes.NOT_FOUND,
+                "Бронирования с таким id не существует");
+            return NotFound(error);
+        }
+        
+        return new CancelBookingResponseDTO
+        {
+            Booking = booking.ToBookingDTO()
+        };
+    }
 }

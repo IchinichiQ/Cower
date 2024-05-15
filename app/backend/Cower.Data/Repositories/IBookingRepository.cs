@@ -1,4 +1,5 @@
 using Cower.Data.Models;
+using Cower.Domain.Models.Booking;
 
 namespace Cower.Data.Repositories;
 
@@ -16,4 +17,5 @@ public interface IBookingRepository
         DateOnly bookingDate,
         TimeOnly startTime,
         TimeOnly endTime);
+    Task<BookingDAL?> SetBookingStatus(long id, BookingStatus status);
 }
