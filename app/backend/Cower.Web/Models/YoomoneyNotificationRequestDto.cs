@@ -7,7 +7,7 @@ public class YoomoneyNotificationRequestDto
     public decimal amount { get; set; }
     public decimal withdraw_amount { get; set; }
     public string currency { get; set; }
-    public DateTime datetime { get; set; }
+    public string datetime { get; set; }
     public string sender { get; set; }
     public bool codepro { get; set; }
     public string label { get; set; }

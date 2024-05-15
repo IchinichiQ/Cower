@@ -6,7 +6,7 @@ public sealed record YoomoneyNotification(
     decimal Amount,
     decimal WithdrawAmount,
     string Currency,
-    DateTime Datetime,
+    string Datetime,
     string Sender,
     bool Codepro,
     string Label,
