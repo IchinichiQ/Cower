@@ -1,3 +1,4 @@
+using Cower.Data.Extensions;
 using Cower.Data.Models;
 using Cower.Data.Models.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -30,5 +31,48 @@ public class BookingRepository : IBookingRepository
                 x.StartTime,
                 x.EndTime))
             .ToArrayAsync();
+    }
+
+    public async Task<IReadOnlyCollection<BookingDAL>> GetUserBookings(long userId)
+    {
+        return await _db.Bookings
+            .Where(x => x.UserId == userId)
+            .Include(x => x.Payment)
+            .Select(x => x.ToBookingDAL())
+            .ToArrayAsync();
+    }
+
+    public async Task<BookingDAL?> GetBooking(long id)
+    {
+        return await _db.Bookings
+            .Where(x => x.Id == id)
+            .Include(x => x.Payment)
+            .Select(x => x.ToBookingDAL())
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<BookingDAL> AddBooking(BookingDAL booking)
+    {
+        var entity = booking.ToBookingEntity();
+        _db.Bookings.Add(entity);
+        await _db.SaveChangesAsync();
+        
+        return entity.ToBookingDAL();
+    }
+
+    public async Task<bool> IsBookingTimeOverlaps(
+        long seatId,
+        DateOnly bookingDate,
+        TimeOnly startTime,
+        TimeOnly endTime)
+    {
+        return await _db.Bookings
+            .Where(x => x.SeatId == seatId &&
+                        x.BookingDate == bookingDate &&
+                        (startTime == x.StartTime ||
+                         endTime == x.EndTime ||
+                         (startTime > x.StartTime && startTime < x.EndTime) ||
+                         (endTime >= x.StartTime && endTime < x.EndTime)))
+            .AnyAsync();
     }
 }
