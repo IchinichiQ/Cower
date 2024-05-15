@@ -28,6 +28,7 @@ public class YoomoneyController : ControllerBase
     public async Task<ActionResult> ProcessNotification([FromForm] YoomoneyNotificationRequestDto notification)
     {
         _logger.LogInformation(JsonSerializer.Serialize(notification));
+        
         if (!_yoomoneyService.ValidateNotification(notification.ToYoomoneyNotification()))
         {
             _logger.LogWarning("Invalid SHA-1 hash in YooMoney notification");
