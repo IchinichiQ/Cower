@@ -1,8 +1,8 @@
-import {Order} from "@/types/Order";
+import {NewBookingInfo} from "@/types/Booking";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
 export interface OrderState {
-  order: Order | null;
+  order: NewBookingInfo | null;
 }
 
 const initialState: OrderState = {
@@ -13,7 +13,7 @@ const orderSlice = createSlice({
   name: 'order',
   initialState,
   reducers: {
-    setOrder(state, action: PayloadAction<Order | null>) {
+    setOrder(state, action: PayloadAction<NewBookingInfo | null>) {
       state.order = action.payload;
     },
   }
