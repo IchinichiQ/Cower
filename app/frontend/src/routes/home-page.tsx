@@ -65,6 +65,7 @@ export const HomePage = () => {
   const navigate = useNavigate();
   const handleCreateOrder = (seat: Seat) => {
     setOrder({
+      seatId: seat.id,
       place: seat.number,
       timeFrom,
       timeTo,

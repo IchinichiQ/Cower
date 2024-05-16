@@ -1,27 +1,35 @@
 import {useAppSelector} from "@/redux";
 import {Button, Flex} from "antd";
 import {ToHomeButton} from "@/components/ToHomeButton";
-import {useNavigate} from "react-router-dom";
-import {useActions} from "@/redux/actions";
 import {formatOrderTime} from "@/utils/formatOrderTime";
-import ym from "react-yandex-metrika";
+import axios from "axios";
+import {useState} from "react";
+import {ErrorText} from "@/styles/styles";
 
 export const CheckoutPage = () => {
   const {order} = useAppSelector(state => state.order);
+  const [errors, setErrors] = useState<string[]>([])
 
-  const {address, date, place, timeFrom, timeTo} = order!;
+  const {address, date, place, timeFrom, timeTo, price, seatId} = order!;
 
-  const navigate = useNavigate();
-
-  const {addOrder} = useActions();
   const handleSubmit = () => {
-    // addOrder({
-    //   ...order!,
-    //   status: 'оплачен',
-    //   price: 400,
-    // })
-    // ym('97166984','reachGoal','create-order');
-    navigate('/payment-result');
+    setErrors([]);
+    axios.post('/api/v1/bookings', {
+      seatId,
+      bookingDate: date,
+      startTime: `${String(timeFrom).padStart(2, '0')}:00`,
+      endTime: `${String(timeTo).padStart(2, '0')}:00`,
+    })
+      .then(res => {
+        window.open(res.data.booking.paymentUrl);
+      })
+      .catch(e => {
+        if (e.response) {
+          setErrors(e.response.data.error.details);
+        } else {
+          setErrors(['Не удалось авторизоваться']);
+        }
+      });
   }
   return (
     <div style={{paddingInline: 30}}>
@@ -32,8 +40,11 @@ export const CheckoutPage = () => {
         <div>{formatOrderTime(timeFrom, timeTo, date)}</div>
         <div>{address}</div>
         <div>Место: {place}</div>
-        <div><b>400р.</b></div>
+        <div><b>{price * (timeTo - timeFrom)}р.</b></div>
         <Button onClick={handleSubmit}>Оплатить заказ</Button>
+        {errors.map(error =>
+          <ErrorText>{error}</ErrorText>
+        )}
       </Flex>
     </div>
   );
