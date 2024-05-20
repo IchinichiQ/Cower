@@ -1,5 +1,4 @@
 using System.Net;
-using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Cower.Data;
@@ -10,6 +9,7 @@ using Cower.Domain.Models.Booking;
 using Cower.Service.Services;
 using Cower.Service.Services.Implementation;
 using Cower.Web;
+using Cower.Web.HostedServices;
 using Cower.Web.StatusCodeHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -98,6 +98,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICoworkingRepository, CoworkingRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
+
+builder.Services.AddHostedService<UpdatePaymentTimeoutStatusHostedService>();
+builder.Services.AddHostedService<UpdateInProgressStatusHostedService>();
+builder.Services.AddHostedService<UpdateSuccessStatusHostedService>();
 
 var app = builder.Build();
 

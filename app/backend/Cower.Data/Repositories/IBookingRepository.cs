@@ -19,4 +19,7 @@ public interface IBookingRepository
         TimeOnly startTime,
         TimeOnly endTime);
     Task<BookingDAL?> SetBookingStatus(long id, BookingStatus status);
+    Task<int> SetPaymentTimeoutStatus();
+    Task<int> SetInProgressStatus();
+    Task<int> SetSuccessBookingStatus();
 }

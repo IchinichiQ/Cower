@@ -138,6 +138,11 @@ public class BookingService : IBookingService
         {
             return false;
         }
+
+        if (booking.Status != BookingStatus.AwaitingPayment)
+        {
+            return false;
+        }
         
         if (Math.Abs(amount - booking.Price) > 1m)
         {
@@ -147,6 +152,21 @@ public class BookingService : IBookingService
         await _bookingRepository.SetBookingStatus(booking.Id, BookingStatus.Paid);
         
         return true;
+    }
+
+    public async Task<int> UpdatePaymentTimeoutStatus()
+    {
+        return await _bookingRepository.SetPaymentTimeoutStatus();
+    }
+
+    public async Task<int> UpdateInProgressStatus()
+    {
+        return await _bookingRepository.SetInProgressStatus();
+    }
+
+    public async Task<int> UpdateSuccessStatus()
+    {
+        return await _bookingRepository.SetSuccessBookingStatus();
     }
 
     private void ValidateCreateBookingRequest(CreateBookingRequestBL request)
