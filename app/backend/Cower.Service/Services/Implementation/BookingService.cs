@@ -76,7 +76,9 @@ public class BookingService : IBookingService
             throw new BusinessLogicException("Время бронирования пересекается с другим бронированием");
         }
 
-        var bookingPrice = Math.Ceiling((int)(request.EndTime - request.StartTime).TotalMinutes * (seat.Price / 60m));
+        var bookedHours = (decimal)(request.EndTime - request.StartTime).TotalHours;
+        var bookingPrice = Math.Ceiling(seat.Price * bookedHours);
+        
         var label = Guid.NewGuid().ToString();
         var paymentUrl = await _yoomoneyService.GetPaymentUrl(label, bookingPrice);
         
