@@ -41,7 +41,7 @@ public class YoomoneyController : ControllerBase
 
         _logger.LogInformation($"Got yoomoney notification for label={notification.label}");
         
-        var res = await _bookingService.ProcessPayment(notification.label, notification.amount);
+        var res = await _bookingService.ProcessPayment(notification.label, notification.withdraw_amount);
         
         _logger.LogInformation($"Is notification changed status - {res}");
         
