@@ -7,6 +7,7 @@ namespace Cower.Data.Models.Entities;
 [Index(nameof(Email), IsUnique = true)]
 public class UserEntity
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
     public string Email { get; set; }
     public byte[] PasswordHash { get; set; }
