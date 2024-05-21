@@ -15,11 +15,11 @@ export const CheckoutPage = () => {
 
   const {addOrder} = useActions();
   const handleSubmit = () => {
-    addOrder({
-      ...order!,
-      status: 'оплачен',
-      price: 400,
-    })
+    // addOrder({
+    //   ...order!,
+    //   status: 'оплачен',
+    //   price: 400,
+    // })
     // ym('97166984','reachGoal','create-order');
     navigate('/payment-result');
   }
