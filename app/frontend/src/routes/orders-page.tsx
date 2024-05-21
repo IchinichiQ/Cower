@@ -23,7 +23,8 @@ export const OrdersPage = () => {
       {loading ? <h3>Загрузка...</h3> :
         <Flex vertical gap={24}>
           {orders.map(order =>
-            <OrderItem time={formatOrderTime(order.timeFrom, order.timeTo, order.date)} address={order.address} place={order.place} status={order.status} cost={order.cost} />
+            <OrderItem time={formatOrderTime(order.timeFrom, order.timeTo, order.date)} address={order.address}
+                       place={order.place} status={order.status} cost={order.cost}/>
           )}
           {!orders.length && 'Заказов пока нет'}
           {/*<OrderItem address='ул. Пушкина 22, 2 этаж' cost={400} place={10} status='оплачен' time='Понедельник, 11 марта, 10:00 - 15:00' />*/}

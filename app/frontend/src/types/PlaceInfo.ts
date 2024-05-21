@@ -3,4 +3,5 @@ export interface PlaceInfo {
   timeFrom: number;
   timeTo: number;
   place: number;
+  description: string;
 }

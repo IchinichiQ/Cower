@@ -18,7 +18,7 @@ export const CheckoutPage = () => {
     addOrder({
       ...order!,
       status: 'оплачен',
-      cost: 400,
+      price: 400,
     })
     // ym('97166984','reachGoal','create-order');
     navigate('/payment-result');
