@@ -19,7 +19,7 @@ export const PaymentResultPage = () => {
     <div style={{paddingInline: 30}}>
       {loading ? 'Загрузка...' :
         <>
-          <ToHomeButton />
+          <ToHomeButton/>
 
           <h1 style={{marginBlock: 20}}>Заказ успешно оплачен!</h1>
 

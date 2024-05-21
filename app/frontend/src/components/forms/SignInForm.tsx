@@ -1,4 +1,4 @@
-import {useFormik} from 'formik';
+import {FormikErrors, useFormik} from 'formik';
 import {Button, Flex, Input} from 'antd';
 import {useState} from 'react';
 import axios from 'axios';
@@ -7,27 +7,57 @@ import {baseUrl} from '@/api';
 import {ErrorText} from '@/styles/styles';
 import ym from "react-yandex-metrika";
 
-const SignInForm = () => {
-  const [error, setError] = useState('');
-  const {setUser, setJwt} = useActions();
+interface FormValues {
+  email: string;
+  password: string;
+}
 
-  const formik = useFormik({
+const validate = (values: FormValues) => {
+  const errors: FormikErrors<FormValues> = {};
+
+  if (!values.email.length) {
+    errors.email = 'Поле обязательно';
+  }
+
+  if (!values.password.length) {
+    errors.password = 'Поле обязательно';
+  }
+
+  return errors;
+}
+
+const SignInForm = () => {
+  const [errors, setErrors] = useState<string[]>([]);
+  const {setUser, setJwt} = useActions();
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const formik = useFormik<FormValues>({
     initialValues: {
       email: '',
       password: ''
     },
+    validate(values) {
+      setSubmitAttempted(true);
+      return validate(values);
+    },
+    validateOnChange: submitAttempted,
     onSubmit(values) {
+      setErrors([]);
       axios.post(baseUrl + '/user/login', values)
         .then(res => {
           if (res.status === 200) {
             setUser(res.data.user);
             setJwt(res.data.jwt);
-            setError('');
+            setErrors([]);
           }
           // ym('97166984','reachGoal','register');
         })
         .catch(e => {
-          setError('Не удалось авторизоваться');
+          if (e.response) {
+            setErrors(e.response.data.error.details);
+          } else {
+            setErrors(['Не удалось авторизоваться']);
+          }
         });
     },
   });
@@ -58,7 +88,9 @@ const SignInForm = () => {
           <ErrorText>{formik.errors.password}</ErrorText>
         </div>
         <Button htmlType="submit">Войти</Button>
-        <ErrorText>{error}</ErrorText>
+        {errors.map((error, index) =>
+          <ErrorText key={index}>{error}</ErrorText>
+        )}
       </Flex>
     </form>
   );
