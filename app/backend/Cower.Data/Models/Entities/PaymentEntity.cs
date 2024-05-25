@@ -10,7 +10,6 @@ public class PaymentEntity
     public long Id { get; set; }
     public long BookingId { get; set; }
     public string Label { get; set; }
-    public string PaymentUrl { get; set; }
     public bool IsCompleted { get; set; }
     public DateTimeOffset ExpireAt { get; set; }
     

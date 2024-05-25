@@ -271,11 +271,6 @@ namespace Cower.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("label");
 
-                    b.Property<string>("PaymentUrl")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("payment_url");
-
                     b.HasKey("Id")
                         .HasName("pk_payments");
 
