@@ -107,7 +107,7 @@ const SignUpForm = () => {
             name="email"
             type="text"
           />
-           <ErrorText>{formik.errors.email}</ErrorText>
+          <ErrorText>{formik.errors.email}</ErrorText>
         </div>
         <div>
           <label htmlFor="password">Пароль:</label>

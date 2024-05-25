@@ -1,9 +1,8 @@
-export interface Order {
+export interface NewBookingInfo {
   date: string;
   timeFrom: number;
   timeTo: number;
   address: string;
   place: number;
-  cost: number;
-  status: string;
+  price: number;
 }
