@@ -80,7 +80,7 @@ export const HomePage = () => {
   const [coworkingId, setCoworkingId] = useState<number | undefined>();
 
   useEffect(() => {
-    axios.get('api/coworking')
+    axios.get(`${baseUrl}/coworking`)
       .then(response => {
         if ('data' in response) {
           setCoworkingList(response.data.coworkings);
