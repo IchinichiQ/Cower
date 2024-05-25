@@ -7,19 +7,24 @@ import {useAppSelector} from "@/redux";
 import {formatOrderTime} from "@/utils/formatOrderTime";
 import {Booking, PaymentStatus, PaymentStatusLabel} from "@/types/Booking";
 import axios from "axios";
+import {baseUrl} from "@/api";
 
 export const OrdersPage = () => {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    axios.get('/api/v1/bookings')
+  const fetchBookings = () => {
+    axios.get(`${baseUrl}/v1/bookings`)
       .then(res => {
         if ('data' in res) {
           setBookings(res.data.bookings);
           setLoading(false);
         }
       })
+  }
+
+  useEffect(() => {
+    fetchBookings();
   }, []);
 
   return (
@@ -31,7 +36,11 @@ export const OrdersPage = () => {
       {loading ? <h3>Загрузка...</h3> :
         <Flex vertical gap={24}>
           {bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(booking =>
-            <BookingItem key={booking.id} booking={booking}/>
+            <BookingItem
+              key={booking.id}
+              booking={booking}
+              onCancel={fetchBookings}
+            />
           )}
           {!bookings.length && 'Заказов пока нет'}
         </Flex>
