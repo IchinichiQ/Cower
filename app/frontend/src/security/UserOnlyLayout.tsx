@@ -1,5 +1,5 @@
 import ProtectedLayout from '@/security/ProtectedLayout';
-import {useAuthorizedUser} from '@/redux/userSlice.js';
+import {useAuthorizedUser} from '@/redux/userSlice';
 import {FC} from "react";
 import {UserRole} from "@/types/User";
 
