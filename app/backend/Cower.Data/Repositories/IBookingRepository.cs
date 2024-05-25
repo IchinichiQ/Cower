@@ -11,6 +11,7 @@ public interface IBookingRepository
         IReadOnlyCollection<long> seatIds);
     Task<IReadOnlyCollection<BookingDAL>> GetUserBookings(long userId);
     Task<BookingDAL?> GetBooking(long id);
+    Task<BookingDAL?> GetBooking(string label);
     Task<BookingDAL> AddBooking(BookingDAL booking);
     Task<bool> IsBookingTimeOverlaps(
         long seatId,
@@ -18,4 +19,7 @@ public interface IBookingRepository
         TimeOnly startTime,
         TimeOnly endTime);
     Task<BookingDAL?> SetBookingStatus(long id, BookingStatus status);
+    Task<int> SetPaymentTimeoutStatus();
+    Task<int> SetInProgressStatus();
+    Task<int> SetSuccessBookingStatus();
 }

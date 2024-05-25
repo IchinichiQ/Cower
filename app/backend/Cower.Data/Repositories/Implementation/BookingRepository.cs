@@ -56,6 +56,15 @@ public class BookingRepository : IBookingRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<BookingDAL?> GetBooking(string label)
+    {
+        return await _db.Bookings
+            .Include(x => x.Payment)
+            .Where(x => x.Payment != null && x.Payment.Label == label)
+            .Select(x => x.ToBookingDAL())
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<BookingDAL> AddBooking(BookingDAL booking)
     {
         var entity = booking.ToBookingEntity();
@@ -99,5 +108,53 @@ public class BookingRepository : IBookingRepository
         await _db.SaveChangesAsync();
 
         return entity.ToBookingDAL();
+    }
+
+    public async Task<int> SetPaymentTimeoutStatus()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var updated = await _db.Bookings
+            .Include(x => x.Payment)
+            .Where(x => 
+                x.Status == BookingStatus.AwaitingPayment &&
+                x.Payment != null &&
+                x.Payment.ExpireAt <= now)
+            .ExecuteUpdateAsync(x =>
+                x.SetProperty(entity => entity.Status, BookingStatus.PaymentTimeout));
+
+        return updated;
+    }
+
+    public async Task<int> SetInProgressStatus()
+    {
+        var now = DateTimeOffset.Now;
+        now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(now, "Russian Standard Time");
+        
+        var updated = await _db.Bookings
+            .Where(x => 
+                x.Status == BookingStatus.Paid &&
+                x.BookingDate <= DateOnly.FromDateTime(now.DateTime) &&
+                x.StartTime <= TimeOnly.FromDateTime(now.DateTime) &&
+                x.EndTime > TimeOnly.FromDateTime(now.DateTime))
+            .ExecuteUpdateAsync(x =>
+                x.SetProperty(entity => entity.Status, BookingStatus.InProgress));
+
+        return updated;
+    }
+
+    public async Task<int> SetSuccessBookingStatus()
+    {
+        var now = DateTimeOffset.Now;
+        now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(now, "Russian Standard Time");
+
+        var updated = await _db.Bookings
+            .Where(x => 
+                (x.Status == BookingStatus.InProgress || x.Status == BookingStatus.Paid) &&
+                x.BookingDate <= DateOnly.FromDateTime(now.DateTime) &&
+                x.EndTime <= TimeOnly.FromDateTime(now.DateTime))
+            .ExecuteUpdateAsync(x =>
+                x.SetProperty(entity => entity.Status, BookingStatus.Success));
+
+        return updated;
     }
 }

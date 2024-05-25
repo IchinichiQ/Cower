@@ -5,7 +5,7 @@ namespace Cower.Web.Extensions;
 
 internal static class BookingExt
 {
-    public static BookingDTO ToBookingDTO(this Booking? booking)
+    public static BookingDTO ToBookingDTO(this Booking booking)
     {
         return new BookingDTO
         {
@@ -17,7 +17,7 @@ internal static class BookingExt
             StartTime = booking.StartTime.ToString(),
             EndTime = booking.EndTime.ToString(),
             Status = booking.Status,
-            PaymentUrl = "stub",
+            PaymentUrl = booking.Payment?.PaymentUrl,
             PaymentExpireAt = booking.Payment?.ExpireAt.ToString("O"),
             Price = booking.Price,
             SeatNumber = booking.SeatNumber,

@@ -9,4 +9,8 @@ public interface IBookingService
     Task<IReadOnlyCollection<Booking>> GetUserBookings(long userId);
     Task<Booking> AddBooking(CreateBookingRequestBL request);
     Task<Booking?> CancelBooking(long id, long userId);
+    Task<bool> ProcessPayment(string label, decimal amount);
+    Task<int> UpdatePaymentTimeoutStatus();
+    Task<int> UpdateInProgressStatus();
+    Task<int> UpdateSuccessStatus();
 }
