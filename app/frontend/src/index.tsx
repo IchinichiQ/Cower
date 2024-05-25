@@ -58,7 +58,7 @@ const router = createHashRouter([
             ]
           },
           {
-            path: 'orders',
+            path: 'bookings',
             element: <OrdersPage/>
           },
           {

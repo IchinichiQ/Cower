@@ -13,7 +13,7 @@ export const OrdersPage = () => {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchBookings = () => {
     axios.get(`${baseUrl}/v1/bookings`)
       .then(res => {
         if ('data' in res) {
@@ -21,6 +21,10 @@ export const OrdersPage = () => {
           setLoading(false);
         }
       })
+  }
+
+  useEffect(() => {
+    fetchBookings();
   }, []);
 
   return (
@@ -32,7 +36,11 @@ export const OrdersPage = () => {
       {loading ? <h3>Загрузка...</h3> :
         <Flex vertical gap={24}>
           {bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(booking =>
-            <BookingItem key={booking.id} booking={booking}/>
+            <BookingItem
+              key={booking.id}
+              booking={booking}
+              onCancel={fetchBookings}
+            />
           )}
           {!bookings.length && 'Заказов пока нет'}
         </Flex>
