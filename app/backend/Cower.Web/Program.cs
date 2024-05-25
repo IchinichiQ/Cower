@@ -1,29 +1,42 @@
 using System.Net;
-using System.Security.Cryptography;
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Cower.Data;
 using Cower.Data.Repositories;
 using Cower.Data.Repositories.Implementation;
 using Cower.Domain.JWT;
+using Cower.Domain.Models.Booking;
 using Cower.Service.Services;
 using Cower.Service.Services.Implementation;
 using Cower.Web;
+using Cower.Web.HostedServices;
 using Cower.Web.StatusCodeHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Npgsql;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
         builder =>
         {
-            builder.AllowAnyOrigin() // Разрешает запросы с любых источников
-                   .AllowAnyMethod() // Разрешает все методы HTTP
-                   .AllowAnyHeader(); // Разрешает все заголовки
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
         });
 });
 
@@ -41,7 +54,11 @@ builder.Services.AddSwaggerGen(c =>
     
     c.OperationFilter<AuthorizeCheckOperationFilter>();
 });
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(opts =>
+{
+    var enumConverter = new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower);
+    opts.JsonSerializerOptions.Converters.Add(enumConverter);
+});
 builder.WebHost.UseKestrel(kestrel =>
 {
     var pfxFilePath = "certificate.pfx";
@@ -71,15 +88,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddDbContext<ApplicationContext>();
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+var dbDataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+dbDataSourceBuilder.MapEnum<BookingStatus>();
+var dbDataSource = dbDataSourceBuilder.Build();
+builder.Services.AddDbContext<ApplicationContext>((options) => {
+    options.UseNpgsql(dbDataSource);
+    options.UseSnakeCaseNamingConvention();
+});
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICoworkingService, CoworkingService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
+builder.Services.AddSingleton<IYoomoneyService, YoomoneyService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICoworkingRepository, CoworkingRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<ISeatRepository, SeatRepository>();
+
+builder.Services.AddHostedService<UpdatePaymentTimeoutStatusHostedService>();
+builder.Services.AddHostedService<UpdateInProgressStatusHostedService>();
+builder.Services.AddHostedService<UpdateSuccessStatusHostedService>();
 
 var app = builder.Build();
 

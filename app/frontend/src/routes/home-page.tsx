@@ -65,6 +65,7 @@ export const HomePage = () => {
   const navigate = useNavigate();
   const handleCreateOrder = (seat: Seat) => {
     setOrder({
+      seatId: seat.id,
       place: seat.number,
       timeFrom,
       timeTo,
@@ -204,7 +205,9 @@ export const HomePage = () => {
                     disabledDate={date => {
                       const d = date.toDate();
                       const weekday = d.toLocaleDateString('en', {weekday: 'long'});
-                      return !coworking?.workingTime.find(t => t.day === weekday);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return !coworking?.workingTime.find(t => t.day === weekday) || d < today;
                     }}
                     suffixIcon={<FontAwesomeIcon fill={'blue'} icon={faCalendarDays}/>}
                     bordered={false}

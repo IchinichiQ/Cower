@@ -67,7 +67,7 @@ export const Navbar = () => {
                 setPopoverOpen(false);
               }}>Личный кабинет</PopoverOption>
               <PopoverOption onClick={() => {
-                navigate('orders');
+                navigate('bookings');
                 setPopoverOpen(false);
               }}>Мои заказы</PopoverOption>
               <PopoverOption onClick={handleLogout}>
