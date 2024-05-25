@@ -11,6 +11,7 @@ public static class BookingDalExt
         {
             Label = bookingDal.Payment.Label,
             IsCompleted = bookingDal.Payment.IsCompleted,
+            PaymentUrl = bookingDal.Payment.PaymentUrl,
             ExpireAt = bookingDal.Payment.ExpireAt
         } : null;
 

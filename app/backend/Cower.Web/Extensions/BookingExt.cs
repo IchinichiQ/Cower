@@ -17,7 +17,7 @@ internal static class BookingExt
             StartTime = booking.StartTime.ToString(),
             EndTime = booking.EndTime.ToString(),
             Status = booking.Status,
-            PaymentUrl = "stub",
+            PaymentUrl = booking.Payment?.PaymentUrl,
             PaymentExpireAt = booking.Payment?.ExpireAt.ToString("O"),
             Price = booking.Price,
             SeatNumber = booking.SeatNumber,

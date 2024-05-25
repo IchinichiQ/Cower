@@ -11,6 +11,7 @@ internal static class BookingEntityExt
             booking.Payment.Id,
             booking.Payment.BookingId,
             booking.Payment.Label,
+            booking.Payment.PaymentUrl,
             booking.Payment.IsCompleted,
             booking.Payment.ExpireAt) : null;
 
