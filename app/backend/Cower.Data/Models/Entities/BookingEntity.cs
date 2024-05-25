@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Cower.Domain.Models.Booking;
 
 namespace Cower.Data.Models.Entities;
 
@@ -15,11 +16,14 @@ public class BookingEntity
     public int SeatNumber { get; set; }
     public int Floor { get; set; }
     public string CoworkingAddress { get; set; } = default!;
-    public string Status { get; set; } = default!;
+    public BookingStatus Status { get; set; }
     
     [ForeignKey("SeatId")]
     public CoworkingSeatEntity Seat { get; set; }
     
     [ForeignKey("UserId")]
     public UserEntity User { get; set; }
+    
+    [InverseProperty("Booking")]
+    public PaymentEntity? Payment { get; set; }
 }
