@@ -5,6 +5,7 @@ import {formatOrderTime} from "@/utils/formatOrderTime";
 import axios from "axios";
 import {useState} from "react";
 import {ErrorText} from "@/styles/styles";
+import {baseUrl} from "@/api";
 
 export const CheckoutPage = () => {
   const {order} = useAppSelector(state => state.order);
@@ -14,14 +15,14 @@ export const CheckoutPage = () => {
 
   const handleSubmit = () => {
     setErrors([]);
-    axios.post('/api/v1/bookings', {
+    axios.post(`${baseUrl}/v1/bookings`, {
       seatId,
       bookingDate: date,
       startTime: `${String(timeFrom).padStart(2, '0')}:00`,
       endTime: `${String(timeTo).padStart(2, '0')}:00`,
     })
       .then(res => {
-        window.open(res.data.booking.paymentUrl);
+        window.open(res.data.booking.paymentUrl, '_self');
       })
       .catch(e => {
         if (e.response) {
