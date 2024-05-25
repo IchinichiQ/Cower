@@ -12,6 +12,7 @@ import axios from "axios";
 import {Coworking, Floor, Seat} from "@/types/Coworking";
 import {StyledSelect} from "@/components/ui/StyledSelect";
 import {ErrorText} from "@/styles/styles";
+import {baseUrl} from "@/api";
 
 const StyledPage = styled('div')`
   flex-grow: 1;
@@ -79,7 +80,7 @@ export const HomePage = () => {
   const [coworkingId, setCoworkingId] = useState<number | undefined>();
 
   useEffect(() => {
-    axios.get('api/coworking')
+    axios.get(`${baseUrl}/coworking`)
       .then(response => {
         if ('data' in response) {
           setCoworkingList(response.data.coworkings);
@@ -90,7 +91,7 @@ export const HomePage = () => {
 
   const handleCoworkingChange = (coworkingId: number) => {
     setCoworkingId(coworkingId);
-    axios.get(`/api/coworking/${coworkingId}`)
+    axios.get(`${baseUrl}/coworking/${coworkingId}`)
       .then(response => {
         if ('data' in response) {
           setCoworking(response.data);
@@ -106,7 +107,7 @@ export const HomePage = () => {
 
   const handleFloorChange = (newFloor: number) => {
     setSelectedFloor(newFloor);
-    axios.get(`/api/coworking/1/floor/${newFloor}`)
+    axios.get(`${baseUrl}/coworking/1/floor/${newFloor}`)
       .then(response => {
         if ('data' in response) {
           setFloor(response.data);
@@ -117,7 +118,7 @@ export const HomePage = () => {
 
   const handleDateChange = (dateStr: string) => {
     setDate(dateStr);
-    axios.get(`/api/coworking/${coworkingId}/seat/availability?date=${dateStr}&${floor!.seats.map(seat => `seatIds=${seat.id}`).join('&')}`)
+    axios.get(`${baseUrl}/coworking/${coworkingId}/seat/availability?date=${dateStr}&${floor!.seats.map(seat => `seatIds=${seat.id}`).join('&')}`)
       .then(response => {
         if ('data' in response) {
           setSeatsAvailability(response.data.availability);
