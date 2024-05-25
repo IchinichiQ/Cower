@@ -9,6 +9,8 @@ namespace Cower.Data.Repositories.Implementation;
 
 public class BookingRepository : IBookingRepository
 {
+    private readonly TimeSpan OFFSET = TimeSpan.FromHours(3);
+    
     private readonly ILogger<BookingRepository> _logger;
     private readonly ApplicationContext _db;
 
@@ -127,8 +129,7 @@ public class BookingRepository : IBookingRepository
 
     public async Task<int> SetInProgressStatus()
     {
-        var now = DateTimeOffset.Now;
-        now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(now, "Russian Standard Time");
+        var now = DateTimeOffset.Now.ToOffset(OFFSET);
         
         var updated = await _db.Bookings
             .Where(x => 
@@ -144,8 +145,7 @@ public class BookingRepository : IBookingRepository
 
     public async Task<int> SetSuccessBookingStatus()
     {
-        var now = DateTimeOffset.Now;
-        now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(now, "Russian Standard Time");
+        var now = DateTimeOffset.Now.ToOffset(OFFSET);
 
         var updated = await _db.Bookings
             .Where(x => 
