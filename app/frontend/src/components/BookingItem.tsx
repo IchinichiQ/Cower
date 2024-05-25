@@ -44,6 +44,7 @@ export const BookingItem: FC<Props> = ({booking, onCancel}) => {
   const timer = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     initTimer();
+
     return () => {
       if (timer.current) {
         clearInterval(timer.current);
