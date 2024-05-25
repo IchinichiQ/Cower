@@ -96,6 +96,7 @@ builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICoworkingRepository, CoworkingRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 
 var app = builder.Build();
 

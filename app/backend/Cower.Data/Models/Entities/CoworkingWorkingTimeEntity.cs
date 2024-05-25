@@ -4,6 +4,7 @@ namespace Cower.Data.Models.Entities;
 
 public class CoworkingWorkingTimeEntity
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
     public int DayOfWeek { get; set; }
     public TimeOnly Open { get; set; }

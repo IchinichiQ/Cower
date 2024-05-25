@@ -4,6 +4,7 @@ namespace Cower.Data.Models.Entities;
 
 public class CoworkingEntity
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
     public string Address { get; set; }
     public int Floors { get; set; }
