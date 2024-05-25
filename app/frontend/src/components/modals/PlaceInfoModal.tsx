@@ -5,7 +5,9 @@ import {formatOrderTime} from "@/utils/formatOrderTime";
 
 interface Props {
   info: PlaceInfo;
+
   onSubmit(): void;
+
   children: ReactNode;
 }
 
@@ -18,6 +20,7 @@ export const PlaceInfoModal: FC<Props> = ({info, children, onSubmit}) => {
         <h2>Выбор места</h2>
         <div>{formatOrderTime(timeFrom, timeTo, date)}</div>
         <div>Место {place}</div>
+        <div>{info.description}</div>
         <Button onClick={onSubmit} style={{width: '100%', marginTop: 15}}>Забронировать</Button>
       </div>}
     >

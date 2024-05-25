@@ -1,17 +1,15 @@
-import {Order} from "@/types/Order";
+import {NewBookingInfo} from "@/types/Booking";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
-export type OrdersState = Order[];
+export type OrdersState = NewBookingInfo[];
 
-const initialState: OrdersState = [
-
-];
+const initialState: OrdersState = [];
 
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
   reducers: {
-    addOrder(state, action: PayloadAction<Order>) {
+    addOrder(state, action: PayloadAction<NewBookingInfo>) {
       state.push(action.payload);
     },
   }
