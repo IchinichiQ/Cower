@@ -7,10 +7,5 @@ namespace Cower.Service.Services;
 public interface ICoworkingService
 {
     public Task<Coworking?> GetCoworking(long id);
-    public Task<IReadOnlyCollection<Coworking>> GetAllCoworkings();
-    public Task<CoworkingFloor?> GetCoworkingFloor(long coworkingId, int floorNum);
-    public Task<CoworkingSeatsAvailavilityResponseBL?> GetSeatsAvailability(
-        DateOnly date,
-        long coworkingId,
-        IReadOnlyCollection<long> seatIds);
+    public Task<IReadOnlyCollection<CoworkingInfo>> GetAllCoworkings();
 }

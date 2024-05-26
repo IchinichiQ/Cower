@@ -22,6 +22,7 @@ namespace Cower.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "booking_status", new[] { "awaiting_payment", "paid", "in_progress", "success", "cancelled", "payment_timeout" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "image_type", new[] { "floor", "seat" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Cower.Data.Models.Entities.BookingEntity", b =>
@@ -104,17 +105,13 @@ namespace Cower.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("address");
 
-                    b.Property<int>("Floors")
-                        .HasColumnType("integer")
-                        .HasColumnName("floors");
-
                     b.HasKey("Id")
                         .HasName("pk_coworkings");
 
                     b.ToTable("coworkings", (string)null);
                 });
 
-            modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingFloorMediaEntity", b =>
+            modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingFloorEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,26 +120,26 @@ namespace Cower.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("BackgroundFilename")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("background_filename");
-
                     b.Property<long>("CoworkingId")
                         .HasColumnType("bigint")
                         .HasColumnName("coworking_id");
+
+                    b.Property<long>("ImageId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("image_id");
 
                     b.Property<int>("Number")
                         .HasColumnType("integer")
                         .HasColumnName("number");
 
                     b.HasKey("Id")
-                        .HasName("pk_coworking_floors_media");
+                        .HasName("pk_coworking_floors");
 
-                    b.HasIndex("CoworkingId")
-                        .HasDatabaseName("ix_coworking_floors_media_coworking_id");
+                    b.HasIndex("CoworkingId", "Number")
+                        .IsUnique()
+                        .HasDatabaseName("ix_coworking_floors_coworking_id_number");
 
-                    b.ToTable("coworking_floors_media", (string)null);
+                    b.ToTable("coworking_floors", (string)null);
                 });
 
             modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingSeatEntity", b =>
@@ -166,9 +163,9 @@ namespace Cower.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<int>("Floor")
-                        .HasColumnType("integer")
-                        .HasColumnName("floor");
+                    b.Property<long>("FloorId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("floor_id");
 
                     b.Property<int>("Height")
                         .HasColumnType("integer")
@@ -207,6 +204,9 @@ namespace Cower.Data.Migrations
 
                     b.HasIndex("CoworkingId")
                         .HasDatabaseName("ix_coworking_seats_coworking_id");
+
+                    b.HasIndex("FloorId")
+                        .HasDatabaseName("ix_coworking_seats_floor_id");
 
                     b.ToTable("coworking_seats", (string)null);
                 });
@@ -391,14 +391,14 @@ namespace Cower.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingFloorMediaEntity", b =>
+            modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingFloorEntity", b =>
                 {
                     b.HasOne("Cower.Data.Models.Entities.CoworkingEntity", "Coworking")
-                        .WithMany()
+                        .WithMany("Floors")
                         .HasForeignKey("CoworkingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_coworking_floors_media_coworkings_coworking_id");
+                        .HasConstraintName("fk_coworking_floors_coworkings_coworking_id");
 
                     b.Navigation("Coworking");
                 });
@@ -412,7 +412,16 @@ namespace Cower.Data.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_coworking_seats_coworkings_coworking_id");
 
+                    b.HasOne("Cower.Data.Models.Entities.CoworkingFloorEntity", "Floor")
+                        .WithMany("Seats")
+                        .HasForeignKey("FloorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_coworking_seats_coworking_floors_floor_id");
+
                     b.Navigation("Coworking");
+
+                    b.Navigation("Floor");
                 });
 
             modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingWorkingTimeEntity", b =>
@@ -458,7 +467,14 @@ namespace Cower.Data.Migrations
 
             modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingEntity", b =>
                 {
+                    b.Navigation("Floors");
+
                     b.Navigation("WorkingTimes");
+                });
+
+            modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingFloorEntity", b =>
+                {
+                    b.Navigation("Seats");
                 });
 
             modelBuilder.Entity("Cower.Data.Models.Entities.UserEntity", b =>

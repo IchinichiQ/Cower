@@ -18,11 +18,11 @@ public class SeatRepository : ISeatRepository
         _db = db;
     }
 
-    public async Task<SeatDAL?> GetSeat(long id)
+    public async Task<CoworkingSeatDal?> GetSeat(long id)
     {
         return await _db.CoworkingSeats
             .Where(x => x.Id == id)
-            .Select(x => x.ToDal())
+            .Select(x => x.ToSeatDal())
             .FirstOrDefaultAsync();
     }
 }

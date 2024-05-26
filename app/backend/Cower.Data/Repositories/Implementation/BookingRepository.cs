@@ -21,26 +21,26 @@ public class BookingRepository : IBookingRepository
         _logger = logger;
         _db = db;
     }
-
-    public async Task<IReadOnlyCollection<BookingTimeSlotDAL>> GetBookingsTimeSlots(
+    
+    public async Task<IReadOnlyCollection<BookingTimeSlotDal>> GetBookingsTimeSlots(
         DateOnly date,
-        long coworkingId,
-        IReadOnlyCollection<long> seatIds)
+        long floorId)
     {
         return await _db.Bookings
-            .Where(x => x.Seat.CoworkingId == coworkingId && 
+            .Include(x => x.Seat)
+            .Where(x => x.Seat != null &&
+                        x.Seat.FloorId == floorId && 
                         x.BookingDate == date && 
                         x.Status != BookingStatus.Cancelled &&
-                        x.Status != BookingStatus.PaymentTimeout &&
-                        seatIds.Any(s => s == x.SeatId))
-            .Select(x => new BookingTimeSlotDAL(
+                        x.Status != BookingStatus.PaymentTimeout)
+            .Select(x => new BookingTimeSlotDal(
                 x.SeatId,
                 x.StartTime,
                 x.EndTime))
             .ToArrayAsync();
     }
 
-    public async Task<IReadOnlyCollection<BookingDAL>> GetUserBookings(long userId)
+    public async Task<IReadOnlyCollection<BookingDal>> GetUserBookings(long userId)
     {
         return await _db.Bookings
             .Where(x => x.UserId == userId)
@@ -49,7 +49,7 @@ public class BookingRepository : IBookingRepository
             .ToArrayAsync();
     }
 
-    public async Task<BookingDAL?> GetBooking(long id)
+    public async Task<BookingDal?> GetBooking(long id)
     {
         return await _db.Bookings
             .Where(x => x.Id == id)
@@ -58,7 +58,7 @@ public class BookingRepository : IBookingRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<BookingDAL?> GetBooking(string label)
+    public async Task<BookingDal?> GetBooking(string label)
     {
         return await _db.Bookings
             .Include(x => x.Payment)
@@ -67,7 +67,7 @@ public class BookingRepository : IBookingRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<BookingDAL> AddBooking(BookingDAL booking)
+    public async Task<BookingDal> AddBooking(BookingDal booking)
     {
         var entity = booking.ToBookingEntity();
         _db.Bookings.Add(entity);
@@ -94,7 +94,7 @@ public class BookingRepository : IBookingRepository
             .AnyAsync();
     }
 
-    public async Task<BookingDAL?> SetBookingStatus(long id, BookingStatus status)
+    public async Task<BookingDal?> SetBookingStatus(long id, BookingStatus status)
     {
         var entity = await _db.Bookings
             .Where(x => x.Id == id)

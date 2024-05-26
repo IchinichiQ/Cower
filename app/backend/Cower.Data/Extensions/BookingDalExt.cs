@@ -5,7 +5,7 @@ namespace Cower.Data.Extensions;
 
 public static class BookingDalExt
 {
-    public static BookingEntity ToBookingEntity(this BookingDAL bookingDal)
+    public static BookingEntity ToBookingEntity(this BookingDal bookingDal)
     {
         var paymentEntity = bookingDal.Payment != null ? new PaymentEntity
         {

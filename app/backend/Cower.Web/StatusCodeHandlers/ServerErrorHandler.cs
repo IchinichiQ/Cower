@@ -23,7 +23,7 @@ public static class ServerErrorHandler
             errorMessage = exception.Message;
         }
         
-        var dto = new ErrorDTO(
+        var dto = new ErrorDto(
             ErrorCodes.INTERNAL_SERVER_ERROR,
             errorMessage);
         var json = JsonSerializer.Serialize(dto, new JsonSerializerOptions

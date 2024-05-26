@@ -11,7 +11,7 @@ public static class UnauthorizedHandler
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
 
-        var dto = new ErrorDTO(
+        var dto = new ErrorDto(
             ErrorCodes.UNAUTHORIZED,
             "Не авторизован");
         var json = JsonSerializer.Serialize(dto, new JsonSerializerOptions

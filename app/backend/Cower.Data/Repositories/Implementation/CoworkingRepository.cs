@@ -1,3 +1,4 @@
+using Cower.Data.Extensions;
 using Cower.Data.Models;
 using Cower.Data.Models.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -18,36 +19,34 @@ public class CoworkingRepository : ICoworkingRepository
         _db = db;
     }
 
-    public async Task<CoworkingEntity?> GetCoworking(long id)
+    public async Task<CoworkingDal?> GetCoworking(long id)
     {
         return await _db.Coworkings
+            .Include(x => x.Floors)
+            .ThenInclude(x => x.Seats)
             .Include(x => x.WorkingTimes)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .Where(x => x.Id == id)
+            .Select(x => x.ToCoworkingDal())
+            .FirstOrDefaultAsync();
     }
 
-    public async Task<IReadOnlyCollection<CoworkingEntity>> GetAllCoworkings()
+    public async Task<CoworkingDal?> GetCoworkingByFloorId(long floorId)
     {
         return await _db.Coworkings
+            .Include(x => x.Floors)
+            .ThenInclude(x => x.Seats)
             .Include(x => x.WorkingTimes)
-            .ToArrayAsync();
+            .Where(x => x.Floors.Any(floor => floor.Id == floorId))
+            .Select(x => x.ToCoworkingDal())
+            .FirstOrDefaultAsync();
     }
 
-    public async Task<CoworkingFloorDAL?> GetCoworkingFloor(long coworkingId, int floorNum)
+    public async Task<IReadOnlyCollection<CoworkingInfoDal>> GetAllCoworkings()
     {
-        var floor = await _db.CoworkingFloorsMedia.FirstOrDefaultAsync(
-            x => x.CoworkingId == coworkingId && x.Number == floorNum);
-
-        if (floor == null)
-        {
-            return null;
-        }
-
-        var seats = await _db.CoworkingSeats
-            .Where(x => x.CoworkingId == coworkingId && x.Floor == floorNum)
+        return await _db.Coworkings
+            .Include(x => x.Floors)
+            .Include(x => x.WorkingTimes)
+            .Select(x => x.ToCoworkingInfoDal())
             .ToArrayAsync();
-
-        return new CoworkingFloorDAL(
-            floor,
-            seats);
     }
 }
