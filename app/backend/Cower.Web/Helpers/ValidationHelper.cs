@@ -5,11 +5,11 @@ namespace Cower.Web.Helpers;
 
 public static class ValidationHelper
 {
-    public static ErrorDTO? Validate(object? obj)
+    public static ErrorDto? Validate(object? obj)
     {
         if (obj == null)
         {
-            return new ErrorDTO(
+            return new ErrorDto(
                 ErrorCodes.INVALID_REQUEST_DATA,
                 "Некорректное тело запроса");
         }
@@ -28,10 +28,10 @@ public static class ValidationHelper
         }
 
 
-        ErrorDTO? dto = null;
+        ErrorDto? dto = null;
         if (errors.Any())
         {
-            dto = new ErrorDTO(
+            dto = new ErrorDto(
                 ErrorCodes.INVALID_REQUEST_DATA,
                 errors);
         }

@@ -1,3 +1,4 @@
+using Cower.Data.Models;
 using Cower.Data.Models.Entities;
 using Cower.Domain.Models.Coworking;
 
@@ -5,21 +6,20 @@ namespace Cower.Service.Extensions;
 
 internal static class CoworkingSeatEntityExtension
 {
-    internal static CoworkingSeat ToCoworkingSeat(this CoworkingSeatEntity entity)
+    internal static CoworkingSeat ToCoworkingSeat(this CoworkingSeatDal dal)
     {
         return new CoworkingSeat(
-            entity.Id,
-            entity.CoworkingId,
-            entity.Floor,
-            entity.Number,
-            entity.Price,
-            entity.ImageFilename,
-            entity.Description,
+            dal.Id,
+            dal.FloorId,
+            dal.Number,
+            dal.Price,
+            dal.ImageFilename,
+            dal.Description,
             new CoworkingSeatPosition(
-                entity.X,
-                entity.Y,
-                entity.Width,
-                entity.Height,
-                entity.Angle));
+                dal.X,
+                dal.Y,
+                dal.Width,
+                dal.Height,
+                dal.Angle));
     }
 }

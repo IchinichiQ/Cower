@@ -5,20 +5,19 @@ namespace Cower.Data.Repositories;
 
 public interface IBookingRepository
 {
-    Task<IReadOnlyCollection<BookingTimeSlotDAL>> GetBookingsTimeSlots(
+    Task<IReadOnlyCollection<BookingTimeSlotDal>> GetBookingsTimeSlots(
         DateOnly date,
-        long coworkingId,
-        IReadOnlyCollection<long> seatIds);
-    Task<IReadOnlyCollection<BookingDAL>> GetUserBookings(long userId);
-    Task<BookingDAL?> GetBooking(long id);
-    Task<BookingDAL?> GetBooking(string label);
-    Task<BookingDAL> AddBooking(BookingDAL booking);
+        long floorId);
+    Task<IReadOnlyCollection<BookingDal>> GetUserBookings(long userId);
+    Task<BookingDal?> GetBooking(long id);
+    Task<BookingDal?> GetBooking(string label);
+    Task<BookingDal> AddBooking(BookingDal booking);
     Task<bool> IsBookingTimeOverlaps(
         long seatId,
         DateOnly bookingDate,
         TimeOnly startTime,
         TimeOnly endTime);
-    Task<BookingDAL?> SetBookingStatus(long id, BookingStatus status);
+    Task<BookingDal?> SetBookingStatus(long id, BookingStatus status);
     Task<int> SetPaymentTimeoutStatus();
     Task<int> SetInProgressStatus();
     Task<int> SetSuccessBookingStatus();

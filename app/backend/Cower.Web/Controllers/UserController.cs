@@ -27,7 +27,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("api/user/register")]
-    public async Task<ActionResult<RegisterResponseDTO>> Register([FromBody] [Required] RegisterRequestDTO request)
+    public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] [Required] RegisterRequestDto request)
     {
         var validationError = ValidationHelper.Validate(request);
         if (validationError != null)
@@ -49,7 +49,7 @@ public class UserController : ControllerBase
         }
         catch (EmailTakenException)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.EMAIL_ALREADY_TAKEN,
                 "Пользователь с такой почтой уже существует");
             return BadRequest(error);
@@ -58,8 +58,8 @@ public class UserController : ControllerBase
 
         var jwt = _jwtService.GenerateJwt(user);
 
-        return new RegisterResponseDTO(
-            new UserResponseDTO(
+        return new RegisterResponseDto(
+            new UserResponseDto(
                 user.Id,
                 user.Email,
                 user.Role.Name,
@@ -70,7 +70,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("api/user/login")]
-    public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO request)
+    public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request)
     {
         var validationError = ValidationHelper.Validate(request);
         if (validationError != null)
@@ -81,7 +81,7 @@ public class UserController : ControllerBase
         var user = await _userService.TryLogin(request.Email, request.Password);
         if (user == null)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.INVALID_CREDENTIALS,
                 "Пользователя с таким логином и паролем не существует");
             return BadRequest(error);
@@ -89,8 +89,8 @@ public class UserController : ControllerBase
 
         var jwt = _jwtService.GenerateJwt(user);
 
-        return new LoginResponseDTO(
-            new UserResponseDTO(
+        return new LoginResponseDto(
+            new UserResponseDto(
                 user.Id,
                 user.Email,
                 user.Role.Name,
@@ -102,13 +102,13 @@ public class UserController : ControllerBase
     
     [HttpGet("api/user/me")]
     [Authorize]
-    public async Task<UserInfoResponseDTO> UserInfo()
+    public async Task<UserInfoResponseDto> UserInfo()
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
         var user = await _userService.GetUser(long.Parse(userId));
 
-        return new UserInfoResponseDTO(
-            new UserResponseDTO(
+        return new UserInfoResponseDto(
+            new UserResponseDto(
                 user.Id,
                 user.Email,
                 user.Role.Name,

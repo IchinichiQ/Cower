@@ -5,7 +5,7 @@ namespace Cower.Service.Extensions;
 
 internal static class BookingDalExt
 {
-    internal static Booking ToBooking(this BookingDAL bookingDal)
+    internal static Booking ToBooking(this BookingDal bookingDal)
     {
         var payment = bookingDal.Payment != null ? new Payment(
             bookingDal.Payment.Id,

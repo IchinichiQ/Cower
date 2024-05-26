@@ -100,12 +100,14 @@ builder.Services.AddDbContext<ApplicationContext>((options) => {
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICoworkingService, CoworkingService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IFloorService, FloorService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddSingleton<IYoomoneyService, YoomoneyService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICoworkingRepository, CoworkingRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IFloorRepository, FloorRepository>();
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 
 builder.Services.AddHostedService<UpdatePaymentTimeoutStatusHostedService>();

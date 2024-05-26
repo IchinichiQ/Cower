@@ -40,7 +40,7 @@ public class UserService : IUserService
             await _userRepository.AddUser(userEntity);
             return userEntity.ToUser();
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
         {
             throw new EmailTakenException();
         }

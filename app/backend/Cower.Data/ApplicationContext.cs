@@ -1,4 +1,5 @@
 using Cower.Data.Models.Entities;
+using Cower.Domain.Models;
 using Cower.Domain.Models.Booking;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -13,12 +14,13 @@ public sealed class ApplicationContext(DbContextOptions<ApplicationContext> opti
     public DbSet<CoworkingEntity> Coworkings { get; set; }
     public DbSet<CoworkingSeatEntity> CoworkingSeats { get; set; }
     public DbSet<CoworkingWorkingTimeEntity> CoworkingsWorkingTime { get; set; }
-    public DbSet<CoworkingFloorMediaEntity> CoworkingFloorsMedia { get; set; }
+    public DbSet<CoworkingFloorEntity> CoworkingFloors { get; set; }
     public DbSet<PaymentEntity> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<BookingStatus>();
+        modelBuilder.HasPostgresEnum<ImageType>();
         
         modelBuilder.Entity<RoleEntity>().HasData(
             new RoleEntity { Id = 1, Name = "Admin" },

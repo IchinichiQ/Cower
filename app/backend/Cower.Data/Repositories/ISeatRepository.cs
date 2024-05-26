@@ -4,5 +4,5 @@ namespace Cower.Data.Repositories;
 
 public interface ISeatRepository
 {
-    Task<SeatDAL?> GetSeat(long id);
+    Task<CoworkingSeatDal?> GetSeat(long id);
 }

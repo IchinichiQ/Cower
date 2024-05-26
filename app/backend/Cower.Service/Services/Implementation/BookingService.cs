@@ -62,7 +62,7 @@ public class BookingService : IBookingService
             throw new NotFoundException("Рабочее место с таким id не найдено");
         }
 
-        var coworking = await _coworkingRepository.GetCoworking(seat.CoworkingId);
+        var coworking = await _coworkingRepository.GetCoworkingByFloorId(seat.FloorId);
         var workingTime = coworking!.WorkingTimes
             .FirstOrDefault(x => x.DayOfWeek == (int)request.BookingDate.DayOfWeek);
         if (workingTime == null || workingTime.Open > request.StartTime || workingTime.Close < request.EndTime)
@@ -82,7 +82,7 @@ public class BookingService : IBookingService
         var label = Guid.NewGuid().ToString();
         var paymentUrl = await _yoomoneyService.GetPaymentUrl(label, bookingPrice);
         
-        var paymentDal = new PaymentDAL(
+        var paymentDal = new PaymentDal(
             -1,
             -1,
             label,
@@ -90,7 +90,7 @@ public class BookingService : IBookingService
             false,
             now.AddMinutes(10));
 
-        var bookingDal = new BookingDAL(
+        var bookingDal = new BookingDal(
             -1,
             request.UserId,
             request.SeatId,
@@ -101,8 +101,8 @@ public class BookingService : IBookingService
             BookingStatus.AwaitingPayment,
             bookingPrice,
             seat.Number,
-            seat.Floor,
-            coworking.Address,
+            1, // seat.Floor,
+            "address", //coworking.Address,
             paymentDal);
 
         bookingDal = await _bookingRepository.AddBooking(bookingDal);
