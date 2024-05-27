@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Cower.Domain.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Cower.Service.Services.Implementation;
@@ -9,41 +10,43 @@ public class YoomoneyService : IYoomoneyService
 {
     private readonly string RECEIVER;
     private readonly string PAYMENT_TYPE;
-    private readonly string SUCCESS_URL;
     private readonly string SECRET;
     private readonly bool IS_DEVELOPMENT;
     
     private readonly ILogger<YoomoneyService> _logger;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public YoomoneyService(ILogger<YoomoneyService> logger)
+    public YoomoneyService(
+        ILogger<YoomoneyService> logger,
+        IHttpContextAccessor contextAccessor)
     {
         _logger = logger;
+        _contextAccessor = contextAccessor;
 
         IS_DEVELOPMENT = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-        // RECEIVER = Environment.GetEnvironmentVariable("YOOMONEY_RECEIVER")!;
-        RECEIVER = "410012099835767";
-        //SECRET = Environment.GetEnvironmentVariable("YOOMONEY_SECRET")!;
-        SECRET = "ogrLBtT6Na3nDXh8WNjpJzBV";
+        RECEIVER = Environment.GetEnvironmentVariable("YOOMONEY_RECEIVER")!;
+        SECRET = Environment.GetEnvironmentVariable("YOOMONEY_SECRET")!;
         PAYMENT_TYPE = "AC";
-        SUCCESS_URL = "https://185.233.187.57:8080/"; // TODO: Change
     }
 
     public async Task<string> GetPaymentUrl(string label, decimal amount)
     {
+        var host = _contextAccessor.HttpContext.Request.Scheme + "://" + _contextAccessor.HttpContext.Request.Host;
+        var successUrl = host.TrimEnd('/') + "/#/payment-result";
+        
         string requestUrl = $"https://yoomoney.ru/quickpay/confirm?" +
                             $"receiver={RECEIVER}&" +
                             $"quickpay-form=button&" +
                             $"paymentType={PAYMENT_TYPE}&" +
                             $"sum={amount}&" +
                             $"label={label}&" +
-                            $"successURL={SUCCESS_URL}";
+                            $"successURL={successUrl}";
 
         HttpClientHandler clientHandler = new HttpClientHandler();
         clientHandler.AllowAutoRedirect = false;
         var client = new HttpClient(clientHandler);
         HttpResponseMessage response = await client.GetAsync(requestUrl);
-
-        // Проверяем статус ответа
+        
         if (response.StatusCode != System.Net.HttpStatusCode.Redirect)
         {
             throw new Exception($"Unexpected response status code when awaiting redirect from YooMoney: {response.StatusCode}");

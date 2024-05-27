@@ -30,7 +30,15 @@ public class FloorRepository : IFloorRepository
 
         var floor = await _db.CoworkingFloors.AddAsync(entity);
         await _db.SaveChangesAsync();
+        
+        await _db.Entry(floor.Entity)
+            .Reference(f => f.Image)
+            .LoadAsync();
 
+        await _db.Entry(floor.Entity)
+            .Collection(f => f.Seats)
+            .LoadAsync();
+        
         return floor.Entity.ToCoworkingFloorDal();
     }
 
@@ -55,7 +63,9 @@ public class FloorRepository : IFloorRepository
     {
         return await _db.CoworkingFloors
             .Where(x => x.Id == id)
+            .Include(x => x.Image)
             .Include(x => x.Seats)
+            .ThenInclude(x => x.Image)
             .Select(x => x.ToCoworkingFloorDal())
             .FirstOrDefaultAsync();
     }
@@ -63,6 +73,7 @@ public class FloorRepository : IFloorRepository
     public async Task<IReadOnlyCollection<CoworkingFloorInfoDal>> GetAllFloors()
     {
         return await _db.CoworkingFloors
+            .Include(x => x.Image)
             .Select(x => x.ToCoworkingFloorInfoDal())
             .ToArrayAsync();
     }

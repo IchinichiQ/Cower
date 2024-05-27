@@ -16,6 +16,7 @@ public sealed class ApplicationContext(DbContextOptions<ApplicationContext> opti
     public DbSet<CoworkingWorkingTimeEntity> CoworkingsWorkingTime { get; set; }
     public DbSet<CoworkingFloorEntity> CoworkingFloors { get; set; }
     public DbSet<PaymentEntity> Payments { get; set; }
+    public DbSet<ImageEntity> Images { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

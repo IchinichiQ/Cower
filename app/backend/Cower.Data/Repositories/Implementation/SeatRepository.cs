@@ -22,6 +22,7 @@ public class SeatRepository : ISeatRepository
     {
         return await _db.CoworkingSeats
             .Where(x => x.Id == id)
+            .Include(x => x.Image)
             .Select(x => x.ToSeatDal())
             .FirstOrDefaultAsync();
     }

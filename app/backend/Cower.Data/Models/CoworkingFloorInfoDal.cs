@@ -6,4 +6,4 @@ public sealed record CoworkingFloorInfoDal(
     long Id,
     long CoworkingId,
     int Number,
-    Image Image);
+    ImageDal Image);

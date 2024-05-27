@@ -5,6 +5,7 @@ using Cower.Domain.Models;
 using Cower.Domain.Models.Booking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cower.Data.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240526173848_AddImagesTable")]
+    partial class AddImagesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,6 +261,11 @@ namespace Cower.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("extension");
 
+                    b.Property<string>("Filename")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("filename");
+
                     b.Property<long>("Size")
                         .HasColumnType("bigint")
                         .HasColumnName("size");
@@ -268,6 +276,10 @@ namespace Cower.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_images");
+
+                    b.HasIndex("Filename")
+                        .IsUnique()
+                        .HasDatabaseName("ix_images_filename");
 
                     b.ToTable("images", (string)null);
                 });
@@ -428,9 +440,9 @@ namespace Cower.Data.Migrations
                         .HasConstraintName("fk_coworking_floors_coworkings_coworking_id");
 
                     b.HasOne("Cower.Data.Models.Entities.ImageEntity", "Image")
-                        .WithMany("Floors")
+                        .WithMany()
                         .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_coworking_floors_images_image_id");
 
@@ -449,9 +461,9 @@ namespace Cower.Data.Migrations
                         .HasConstraintName("fk_coworking_seats_coworking_floors_floor_id");
 
                     b.HasOne("Cower.Data.Models.Entities.ImageEntity", "Image")
-                        .WithMany("Seats")
+                        .WithMany()
                         .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_coworking_seats_images_image_id");
 
@@ -510,13 +522,6 @@ namespace Cower.Data.Migrations
 
             modelBuilder.Entity("Cower.Data.Models.Entities.CoworkingFloorEntity", b =>
                 {
-                    b.Navigation("Seats");
-                });
-
-            modelBuilder.Entity("Cower.Data.Models.Entities.ImageEntity", b =>
-                {
-                    b.Navigation("Floors");
-
                     b.Navigation("Seats");
                 });
 

@@ -5,6 +5,6 @@ public sealed record CoworkingSeat(
     long FloorId,
     int Number,
     decimal Price,
-    string ImageFilename,
     string? Description,
+    Image Image,
     CoworkingSeatPosition Position);

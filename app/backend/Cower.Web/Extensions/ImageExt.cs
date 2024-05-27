@@ -12,6 +12,7 @@ internal static class ImageExt
             Id = image.Id,
             Url = image.Url,
             Extension = image.Extension,
+            Size = image.Size,
             Type = image.Type
         };
     }

@@ -17,4 +17,7 @@ public class CoworkingFloorEntity
     
     [ForeignKey(nameof(CoworkingId))]
     public CoworkingEntity Coworking { get; set; }
+    
+    [ForeignKey(nameof(ImageId))]
+    public ImageEntity Image { get; set; }
 }

@@ -12,7 +12,7 @@ internal static class CoworkingFloorEntityExt
             entity.Id,
             entity.CoworkingId,
             entity.Number,
-            new Image(1, "https://svgshare.com/i/15tU.svg", "svg", ImageType.Floor), // TODO: Stub
+            entity.Image.ToImageDal(),
             entity.Seats.Select(x => x.ToSeatDal()).ToArray());
     }
     
@@ -22,6 +22,6 @@ internal static class CoworkingFloorEntityExt
             entity.Id,
             entity.CoworkingId,
             entity.Number,
-            new Image(1, "https://svgshare.com/i/15tU.svg", "svg", ImageType.Floor)); // TODO: Stub
+            entity.Image.ToImageDal());
     }
 }

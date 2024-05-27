@@ -7,6 +7,6 @@ public sealed class CoworkingSeatDto
     public int Number { get; set; }
     public decimal Price { get; set; }
     public string? Description { get; set; }
-    public string Image { get; set; }
+    public ImageDto Image { get; set; }
     public CoworkingSeatPositionDto Position { get; set; }
 }

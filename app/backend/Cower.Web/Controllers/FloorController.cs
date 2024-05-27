@@ -125,7 +125,20 @@ public class FloorController : ControllerBase
                 "Коворкинга с таким ID не существует");
             return BadRequest(error);
         }
-        // TODO: Image id error
+        catch (ImageDoesntExistException)
+        {
+            var error = new ErrorDto(
+                ErrorCodes.IMAGE_DOESNT_EXIST,
+                "Изображения с таким ID не существует");
+            return BadRequest(error);
+        }
+        catch (WrongImageType)
+        {
+            var error = new ErrorDto(
+                ErrorCodes.WRONG_IMAGE_TYPE,
+                "Изображение должно иметь тип floor");
+            return BadRequest(error);
+        }
         
         return Ok(floor);
     }
@@ -134,8 +147,14 @@ public class FloorController : ControllerBase
     [Authorize(Roles = AppRoleNames.Admin)]
     public async Task<ActionResult> UpdateFloor(
         [FromRoute] long id,
-        [FromBody] UpdateCoworkingFloorDal dto)
+        [FromBody] UpdateCoworkingFloorDto dto)
     {
+        var validationError = ValidationHelper.Validate(dto);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+        
         var bl = new UpdateFloorBl(
             id,
             dto.CoworkingId,
@@ -161,7 +180,20 @@ public class FloorController : ControllerBase
                 "Коворкинга с таким ID не существует");
             return BadRequest(error);
         }
-        // TODO: Image id error
+        catch (ImageDoesntExistException)
+        {
+            var error = new ErrorDto(
+                ErrorCodes.IMAGE_DOESNT_EXIST,
+                "Изображения с таким ID не существует");
+            return BadRequest(error);
+        }
+        catch (WrongImageType)
+        {
+            var error = new ErrorDto(
+                ErrorCodes.WRONG_IMAGE_TYPE,
+                "Изображение должно иметь тип floor");
+            return BadRequest(error);
+        }
         
         if (floor == null)
         {

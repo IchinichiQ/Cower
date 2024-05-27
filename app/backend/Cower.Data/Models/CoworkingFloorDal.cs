@@ -7,5 +7,5 @@ public sealed record CoworkingFloorDal(
     long Id,
     long CoworkingId,
     int Number,
-    Image Image,
+    ImageDal Image,
     IReadOnlyCollection<CoworkingSeatDal> Seats);
