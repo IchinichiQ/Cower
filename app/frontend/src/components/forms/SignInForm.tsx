@@ -50,7 +50,6 @@ const SignInForm = () => {
             setJwt(res.data.jwt);
             setErrors([]);
           }
-          // ym('97166984','reachGoal','register');
         })
         .catch(e => {
           if (e.response) {

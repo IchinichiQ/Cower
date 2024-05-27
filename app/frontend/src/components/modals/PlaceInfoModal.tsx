@@ -21,6 +21,7 @@ export const PlaceInfoModal: FC<Props> = ({info, children, onSubmit}) => {
         <div>{formatOrderTime(timeFrom, timeTo, date)}</div>
         <div>Место {place}</div>
         <div>{info.description}</div>
+        <div><b>Цена: {info.price}р/час</b></div>
         <Button onClick={onSubmit} style={{width: '100%', marginTop: 15}}>Забронировать</Button>
       </div>}
     >

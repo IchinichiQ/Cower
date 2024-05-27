@@ -14,6 +14,7 @@ import {ProfilePage} from "@/routes/profile-page";
 import {OrderPresentLayout} from "@/security/OrderPresentLayout";
 import {CheckoutPage} from "@/routes/checkout-page";
 import {PaymentResultPage} from "@/routes/payment-result-page";
+import { YMInitializer } from 'react-yandex-metrika';
 
 const router = createHashRouter([
   {
@@ -72,9 +73,12 @@ const router = createHashRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <Provider store={store}>
-    <PersistGate persistor={persistor}>
-      <RouterProvider router={router}/>
-    </PersistGate>
-  </Provider>
+  <>
+    <YMInitializer accounts={[97166984]} />
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <RouterProvider router={router}/>
+      </PersistGate>
+    </Provider>
+  </>
 );
