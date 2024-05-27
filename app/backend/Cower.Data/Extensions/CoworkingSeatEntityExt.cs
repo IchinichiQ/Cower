@@ -12,12 +12,12 @@ internal static class CoworkingSeatEntityExt
             entity.FloorId,
             entity.Number,
             entity.Price,
-            entity.ImageFilename,
             entity.Description,
             entity.X,
             entity.Y,
             entity.Width,
             entity.Height,
-            entity.Angle);
+            entity.Angle,
+            entity.Image.ToImageDal());
     }
 }

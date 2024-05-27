@@ -1,7 +1,8 @@
 namespace Cower.Domain.Models;
 
 public record Image(
-    int Id,
+    long Id,
     string Url,
     string Extension,
+    long Size,
     ImageType Type);

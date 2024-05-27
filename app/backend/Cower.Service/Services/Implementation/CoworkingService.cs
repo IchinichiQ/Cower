@@ -12,22 +12,25 @@ public class CoworkingService : ICoworkingService
     private readonly ILogger<CoworkingService> _logger;
     private readonly ICoworkingRepository _coworkingRepository;
     private readonly IBookingRepository _bookingRepository;
+    private readonly IImageLinkGenerator _imageLinkGenerator;
 
     public CoworkingService(
         ILogger<CoworkingService> logger,
         ICoworkingRepository coworkingRepository,
-        IBookingRepository bookingRepository)
+        IBookingRepository bookingRepository,
+        IImageLinkGenerator imageLinkGenerator)
     {
         _logger = logger;
         _coworkingRepository = coworkingRepository;
         _bookingRepository = bookingRepository;
+        _imageLinkGenerator = imageLinkGenerator;
     }
     
     public async Task<Coworking?> GetCoworking(long id)
     {
         var dal = await _coworkingRepository.GetCoworking(id);
 
-        return dal?.ToCoworking();
+        return dal?.ToCoworking(_imageLinkGenerator);
     }
 
     public async Task<IReadOnlyCollection<CoworkingInfo>> GetAllCoworkings()
@@ -35,7 +38,7 @@ public class CoworkingService : ICoworkingService
         var infoDals = await _coworkingRepository.GetAllCoworkings();
 
         return infoDals
-            .Select(x => x.ToCoworkingInfo())
+            .Select(x => x.ToCoworkingInfo(_imageLinkGenerator))
             .ToArray();
     }
 }

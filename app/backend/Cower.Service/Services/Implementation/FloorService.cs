@@ -17,17 +17,23 @@ public class FloorService : IFloorService
     private readonly IFloorRepository _floorRepository;
     private readonly ICoworkingRepository _coworkingRepository;
     private readonly IBookingRepository _bookingRepository;
+    private readonly IImageRepository _imageRepository;
+    private readonly IImageLinkGenerator _imageLinkGenerator;
 
     public FloorService(
         ILogger<FloorService> logger,
         IFloorRepository floorRepository,
         ICoworkingRepository coworkingRepository,
-        IBookingRepository bookingRepository)
+        IBookingRepository bookingRepository,
+        IImageRepository imageRepository,
+        IImageLinkGenerator imageLinkGenerator)
     {
         _logger = logger;
         _floorRepository = floorRepository;
         _coworkingRepository = coworkingRepository;
         _bookingRepository = bookingRepository;
+        _imageRepository = imageRepository;
+        _imageLinkGenerator = imageLinkGenerator;
     }
 
     public async Task<CoworkingFloor> CreateFloor(CreateFloorBl request)
@@ -36,6 +42,16 @@ public class FloorService : IFloorService
             request.CoworkingId,
             request.ImageId,
             request.Number);
+        
+        var imageType = await _imageRepository.GetImageType(request.ImageId);
+        if (imageType == null)
+        {
+            throw new ImageDoesntExistException();
+        }
+        if (imageType != ImageType.Floor)
+        {
+            throw new WrongImageType();
+        }
         
         CoworkingFloorDal? floor;
         try
@@ -51,7 +67,7 @@ public class FloorService : IFloorService
             throw new CoworkingDoesntExistException();
         }
         
-        return floor.ToCoworkingFloor();
+        return floor.ToCoworkingFloor(_imageLinkGenerator);
     }
 
     public async Task<CoworkingFloor?> UpdateFloor(UpdateFloorBl request)
@@ -62,6 +78,19 @@ public class FloorService : IFloorService
             request.ImageId,
             request.Number);
 
+        if (request.ImageId != null)
+        {
+            var imageType = await _imageRepository.GetImageType(request.ImageId.Value);
+            if (imageType == null)
+            {
+                throw new ImageDoesntExistException();
+            }
+            if (imageType != ImageType.Floor)
+            {
+                throw new WrongImageType();
+            }
+        }
+        
         CoworkingFloorDal? floor;
         try
         {
@@ -76,14 +105,14 @@ public class FloorService : IFloorService
             throw new CoworkingDoesntExistException();
         }
 
-        return floor?.ToCoworkingFloor();
+        return floor?.ToCoworkingFloor(_imageLinkGenerator);
     }
 
     public async Task<CoworkingFloor?> GetFloor(long id)
     {
         var floor = await _floorRepository.GetFloor(id);
 
-        return floor?.ToCoworkingFloor();
+        return floor?.ToCoworkingFloor(_imageLinkGenerator);
     }
 
     public async Task<IReadOnlyCollection<CoworkingFloorInfo>> GetFloors()
@@ -91,7 +120,7 @@ public class FloorService : IFloorService
         var floors = await _floorRepository.GetAllFloors();
 
         return floors
-            .Select(x => x.ToCoworkingFloorInfo())
+            .Select(x => x.ToCoworkingFloorInfo(_imageLinkGenerator))
             .ToArray();
     }
 

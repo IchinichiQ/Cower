@@ -14,7 +14,7 @@ internal static class CoworkingSeatExt
             Number = seat.Number,
             Price = seat.Price,
             Description = seat.Description,
-            Image = seat.ImageFilename,
+            Image = seat.Image.ToImageDto(),
             Position = new CoworkingSeatPositionDto
             {
                 X = seat.Position.X,

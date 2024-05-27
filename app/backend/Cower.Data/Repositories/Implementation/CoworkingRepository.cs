@@ -23,7 +23,10 @@ public class CoworkingRepository : ICoworkingRepository
     {
         return await _db.Coworkings
             .Include(x => x.Floors)
-            .ThenInclude(x => x.Seats)
+            .ThenInclude(floor => floor.Seats)
+            .ThenInclude(seat => seat.Image)
+            .Include(x => x.Floors)
+            .ThenInclude(floor => floor.Image)
             .Include(x => x.WorkingTimes)
             .Where(x => x.Id == id)
             .Select(x => x.ToCoworkingDal())
@@ -34,7 +37,10 @@ public class CoworkingRepository : ICoworkingRepository
     {
         return await _db.Coworkings
             .Include(x => x.Floors)
-            .ThenInclude(x => x.Seats)
+            .ThenInclude(floor => floor.Seats)
+            .ThenInclude(seat => seat.Image)
+            .Include(x => x.Floors)
+            .ThenInclude(floor => floor.Image)
             .Include(x => x.WorkingTimes)
             .Where(x => x.Floors.Any(floor => floor.Id == floorId))
             .Select(x => x.ToCoworkingDal())
@@ -45,6 +51,7 @@ public class CoworkingRepository : ICoworkingRepository
     {
         return await _db.Coworkings
             .Include(x => x.Floors)
+            .ThenInclude(x => x.Image)
             .Include(x => x.WorkingTimes)
             .Select(x => x.ToCoworkingInfoDal())
             .ToArrayAsync();

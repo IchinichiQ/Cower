@@ -8,7 +8,7 @@ public class CoworkingSeatEntity
     public long Id { get; set; }
     public long FloorId { get; set; }
     public decimal Price { get; set; }
-    public string ImageFilename { get; set; } = default!;
+    public long ImageId { get; set; } = default!;
     public string? Description { get; set; }
     
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,9 +20,9 @@ public class CoworkingSeatEntity
     public int Height { get; set; }
     public double Angle { get; set; }
     
-    [ForeignKey("CoworkingId")]
-    public CoworkingEntity Coworking { get; set; }
-    
     [ForeignKey(nameof(FloorId))]
     public CoworkingFloorEntity Floor { get; set; }
+    
+    [ForeignKey(nameof(ImageId))]
+    public ImageEntity Image { get; set; }
 }
