@@ -101,8 +101,8 @@ public class BookingService : IBookingService
             BookingStatus.AwaitingPayment,
             bookingPrice,
             seat.Number,
-            1, // seat.Floor,
-            "address", //coworking.Address,
+            seat.FloorNumber,
+            coworking.Address,
             paymentDal);
 
         bookingDal = await _bookingRepository.AddBooking(bookingDal);

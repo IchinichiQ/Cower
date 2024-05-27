@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cower.Data.Models.Entities;
 
+[Index(nameof(FloorId), nameof(Number), IsUnique = true)]
 public class CoworkingSeatEntity
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

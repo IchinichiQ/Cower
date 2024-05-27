@@ -11,6 +11,7 @@ internal static class CoworkingSeatEntityExt
             entity.Id,
             entity.FloorId,
             entity.Number,
+            entity.Floor.Number,
             entity.Price,
             entity.Description,
             entity.X,

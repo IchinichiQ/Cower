@@ -8,6 +8,7 @@ public record CoworkingSeatDal(
     long Id,
     long FloorId,
     int Number,
+    int FloorNumber,
     decimal Price,
     string? Description,
     int X,
