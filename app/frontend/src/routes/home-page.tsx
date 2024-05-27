@@ -5,7 +5,9 @@ import {faCaretDown, faCalendarDays} from '@fortawesome/free-solid-svg-icons';
 import {ConfigProvider, DatePicker, Dropdown, Flex, Popover, Select} from "antd";
 import {useEffect, useState} from "react";
 import {PlaceInfoModal} from "@/components/modals/PlaceInfoModal";
-import locale from 'antd/locale/ru_RU';
+import dayjs from 'dayjs'
+import 'dayjs/locale/ru.js';
+import updateLocale from 'dayjs/plugin/updateLocale';
 import {useActions} from "@/redux/actions";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
@@ -13,6 +15,13 @@ import {Coworking, Floor, Seat} from "@/types/Coworking";
 import {StyledSelect} from "@/components/ui/StyledSelect";
 import {ErrorText} from "@/styles/styles";
 import {baseUrl} from "@/api";
+import ym from "react-yandex-metrika";
+import locale from "antd/es/locale/ru_RU";
+
+dayjs.extend(updateLocale);
+dayjs.updateLocale('ru-ru', {
+  weekStart: 0,
+});
 
 const StyledPage = styled('div')`
   flex-grow: 1;
@@ -37,6 +46,12 @@ const Map = styled('div')`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 `
 
 const MapWrapper = styled('div')`
@@ -58,7 +73,7 @@ export const HomePage = () => {
   const [date, setDate] = useState('')
 
   const checkTimeValid = () => {
-    return timeFrom < timeTo;
+    return timeFrom < timeTo || timeFrom === -1 || timeTo === -1;
   }
 
   const {setOrder} = useActions();
@@ -94,8 +109,11 @@ export const HomePage = () => {
     axios.get(`${baseUrl}/coworking/${coworkingId}`)
       .then(response => {
         if ('data' in response) {
-          setCoworking(response.data);
-          handleFloorChange(1);
+          const coworking = response.data;
+          coworking.floors.sort((a: Floor, b: Floor) => a.number - b.number);
+          setCoworking(coworking);
+          console.log(coworking)
+          handleFloorChange(coworking.floors[0].id, coworking.floors);
         }
       });
   }
@@ -105,20 +123,18 @@ export const HomePage = () => {
   const [selectedFloor, setSelectedFloor] = useState(-1)
   const [seatsAvailability, setSeatsAvailability] = useState<Record<string, { from: string; to: string }[]>>({})
 
-  const handleFloorChange = (newFloor: number) => {
-    setSelectedFloor(newFloor);
-    axios.get(`${baseUrl}/coworking/1/floor/${newFloor}`)
-      .then(response => {
-        if ('data' in response) {
-          setFloor(response.data);
-          return response.data;
-        }
-      });
+  const handleFloorChange = (id: number, floors?: Floor[]) => {
+    setSelectedFloor(id);
+    setFloor((floors || coworking?.floors || []).find(floor => floor.id === id));
   }
 
   const handleDateChange = (dateStr: string) => {
     setDate(dateStr);
-    axios.get(`${baseUrl}/coworking/${coworkingId}/seat/availability?date=${dateStr}&${floor!.seats.map(seat => `seatIds=${seat.id}`).join('&')}`)
+    if (!dateStr) {
+      return;
+    }
+    ym('reachGoal', 'register');
+    axios.get(`${baseUrl}/v1/floors/${floor?.id}/availability?date=${dateStr}&${floor!.seats!.map(seat => `seatIds=${seat.id}`).join('&')}`)
       .then(response => {
         if ('data' in response) {
           setSeatsAvailability(response.data.availability);
@@ -185,15 +201,15 @@ export const HomePage = () => {
             />
           }
 
-          {coworking &&
+          {coworking?.floors &&
             <StyledSelect
               suffixIcon={<FontAwesomeIcon fill={'blue'} icon={faCaretDown}/>}
               value={selectedFloor}
-              options={Array(coworking.floors).fill(null).map((_, idx) => ({
-                label: `${idx + 1} этаж`,
-                value: idx + 1
+              options={coworking.floors.map((floor) => ({
+                label: `${floor.number} этаж`,
+                value: floor.id
               }))}
-              onChange={handleFloorChange}
+              onChange={(v: number) => handleFloorChange(v)}
             />
           }
 
@@ -207,7 +223,11 @@ export const HomePage = () => {
                       const weekday = d.toLocaleDateString('en', {weekday: 'long'});
                       const today = new Date();
                       today.setHours(0, 0, 0, 0);
-                      return !coworking?.workingTime.find(t => t.day === weekday) || d < today;
+
+                      const diffTime = Math.abs(d.getTime() - today.getTime());
+                      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                      return !coworking?.workingTime.find(t => t.day === weekday) || d < today || diffDays > 31;
                     }}
                     suffixIcon={<FontAwesomeIcon fill={'blue'} icon={faCalendarDays}/>}
                     bordered={false}
@@ -254,20 +274,20 @@ export const HomePage = () => {
                   </div>
                 </Flex>
 
-                {!checkTimeValid() && <ErrorText>Указало некорректное время</ErrorText>}
+                {!checkTimeValid() && <ErrorText style={{marginTop: 10}}>Указано некорректное время</ErrorText>}
               </div>}
             </>
           }
         </SidePanel>
 
-        {floor &&
+        {floor?.seats &&
           <Map>
             <MapWrapper style={{pointerEvents: date ? 'all' : 'none'}}>
               {floor.seats.map(seat =>
                 <PlaceInfoModal
                   key={seat.id}
                   onSubmit={() => handleCreateOrder(seat)}
-                  info={{timeFrom, timeTo, date, place: seat.number, description: seat.description}}
+                  info={{timeFrom, timeTo, date, place: seat.number, price: seat.price, description: seat.description}}
                 >
                   <SeatComponent
                     $active={checkTimeValid() && checkSeatAvailable(seat)}
@@ -276,12 +296,12 @@ export const HomePage = () => {
                       left: seat.position.x,
                       width: seat.position.width,
                       height: seat.position.height,
-                      backgroundImage: `url(${seat.image})`,
+                      backgroundImage: `url(${seat.image.url})`,
                       transform: `rotate(${seat.position.angle})`,
                     }}/>
                 </PlaceInfoModal>
               )}
-              <img src={floor.backgroundImage} alt="map"/>
+              <img src={floor.image.url} alt="map"/>
             </MapWrapper>
           </Map>
         }

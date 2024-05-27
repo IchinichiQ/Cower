@@ -1,6 +1,10 @@
 import {css} from "styled-components";
 
 export const overrides = css`
+  .ant-popover-inner-content {
+    white-space: nowrap;
+  }
+
   .time-dropdown > ul {
     max-height: 200px;
     overflow-y: auto;
@@ -22,13 +26,14 @@ export const overrides = css`
       right: 0;
     }
   }
-  
+
   .ant-picker {
     flex-grow: 1;
-    
+
     .ant-picker-input input {
       font-weight: 600;
     }
+
     .ant-picker-suffix {
       color: unset !important;
     }

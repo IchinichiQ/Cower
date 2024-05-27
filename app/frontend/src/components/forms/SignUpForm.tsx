@@ -5,6 +5,7 @@ import axios from 'axios';
 import {useActions} from '@/redux/actions';
 import {baseUrl} from '@/api';
 import {ErrorText} from "@/styles/styles";
+import ym from "react-yandex-metrika";
 
 interface FormValues {
   name: string;
@@ -54,6 +55,7 @@ const SignUpForm = () => {
           setUser(res.data.user);
           setJwt(res.data.jwt);
           setErrors([]);
+          ym('reachGoal','register');
         })
         .catch(e => {
           if (e.response) {
