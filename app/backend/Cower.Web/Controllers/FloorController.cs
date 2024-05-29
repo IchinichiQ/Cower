@@ -145,7 +145,7 @@ public class FloorController : ControllerBase
     
     [HttpPatch("{id}")]
     [Authorize(Roles = AppRoleNames.Admin)]
-    public async Task<ActionResult> UpdateFloor(
+    public async Task<ActionResult<CoworkingFloorDto>> UpdateFloor(
         [FromRoute] long id,
         [FromBody] UpdateCoworkingFloorDto dto)
     {
@@ -203,7 +203,7 @@ public class FloorController : ControllerBase
             return NotFound(error);
         }
         
-        return Ok(floor);
+        return Ok(floor.ToCoworkingFloorDto());
     }
     
     [HttpDelete("{id}")]
