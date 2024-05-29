@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cower.Web.Controllers;
 
-[Route("api/v1/user")]
+[Route("api/v1/users")]
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;

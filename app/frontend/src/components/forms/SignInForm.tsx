@@ -43,7 +43,7 @@ const SignInForm = () => {
     validateOnChange: submitAttempted,
     onSubmit(values) {
       setErrors([]);
-      axios.post(baseUrl + '/v1/user/login', values)
+      axios.post(baseUrl + '/v1/users/login', values)
         .then(res => {
           if (res.status === 200) {
             setUser(res.data.user);
