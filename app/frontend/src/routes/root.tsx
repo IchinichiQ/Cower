@@ -12,7 +12,7 @@ export const Root = () => {
   const {setUser, clearUser} = useActions();
 
   useEffect(() => {
-    axios.get(baseUrl + '/user/me')
+    axios.get(baseUrl + '/v1/users/me')
       .then(res => {
         setUser(res.data.user);
       })

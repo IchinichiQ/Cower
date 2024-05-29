@@ -93,7 +93,7 @@ public class FloorController : ControllerBase
     
     [HttpPost]
     [Authorize(Roles = AppRoleNames.Admin)]
-    public async Task<ActionResult<CoworkingFloorDto>> CreateFloor(CreateCoworkingFloorDto dto)
+    public async Task<ActionResult<CoworkingFloorDto>> CreateFloor([FromBody] CreateCoworkingFloorDto dto)
     {
         var validationError = ValidationHelper.Validate(dto);
         if (validationError != null)

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cower.Web.Controllers;
 
+[Route("api/v1/users")]
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;
@@ -26,7 +27,7 @@ public class UserController : ControllerBase
         _jwtService = jwtService;
     }
 
-    [HttpPost("api/user/register")]
+    [HttpPost("register")]
     public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] [Required] RegisterRequestDto request)
     {
         var validationError = ValidationHelper.Validate(request);
@@ -69,7 +70,7 @@ public class UserController : ControllerBase
             jwt);
     }
     
-    [HttpPost("api/user/login")]
+    [HttpPost("login")]
     public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request)
     {
         var validationError = ValidationHelper.Validate(request);
@@ -100,7 +101,7 @@ public class UserController : ControllerBase
             jwt);
     }
     
-    [HttpGet("api/user/me")]
+    [HttpGet("me")]
     [Authorize]
     public async Task<UserInfoResponseDto> UserInfo()
     {

@@ -50,7 +50,7 @@ const SignUpForm = () => {
     },
     validateOnChange: submitAttempted,
     onSubmit(values) {
-      axios.post(baseUrl + '/user/register', values)
+      axios.post(baseUrl + '/v1/users/register', values)
         .then(res => {
           setUser(res.data.user);
           setJwt(res.data.jwt);

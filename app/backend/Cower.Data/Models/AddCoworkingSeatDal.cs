@@ -4,7 +4,7 @@ public sealed record AddCoworkingSeatDal(
     long FloorId,
     int Number,
     decimal Price,
-    string Description,
+    string? Description,
     long ImageId,
     int X,
     int Y,
