@@ -95,7 +95,7 @@ export const HomePage = () => {
   const [coworkingId, setCoworkingId] = useState<number | undefined>();
 
   useEffect(() => {
-    axios.get(`${baseUrl}/coworking`)
+    axios.get(`${baseUrl}/v1/coworking`)
       .then(response => {
         if ('data' in response) {
           setCoworkingList(response.data.coworkings);
@@ -106,7 +106,7 @@ export const HomePage = () => {
 
   const handleCoworkingChange = (coworkingId: number) => {
     setCoworkingId(coworkingId);
-    axios.get(`${baseUrl}/coworking/${coworkingId}`)
+    axios.get(`${baseUrl}/v1/coworking/${coworkingId}`)
       .then(response => {
         if ('data' in response) {
           const coworking = response.data;
