@@ -6,14 +6,14 @@ internal static class IntExtension
     {
         return dayOfWeekNumber switch
         {
-            1 => DayOfWeek.Monday,
-            2 => DayOfWeek.Tuesday,
-            3 => DayOfWeek.Wednesday,
-            4 => DayOfWeek.Thursday,
-            5 => DayOfWeek.Friday,
-            6 => DayOfWeek.Saturday,
-            7 => DayOfWeek.Sunday,
-            _ => throw new ArgumentException("Invalid day of week number. It should be between 1 and 7."),
+            0 => DayOfWeek.Monday,
+            1 => DayOfWeek.Tuesday,
+            2 => DayOfWeek.Wednesday,
+            3 => DayOfWeek.Thursday,
+            4 => DayOfWeek.Friday,
+            5 => DayOfWeek.Saturday,
+            6 => DayOfWeek.Sunday,
+            _ => throw new ArgumentException("Invalid day of week number. It must be between 0 and 6."),
         };
     }
 }

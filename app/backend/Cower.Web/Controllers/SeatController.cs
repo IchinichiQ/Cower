@@ -1,4 +1,3 @@
-using Cower.Data.Models;
 using Cower.Domain.Models;
 using Cower.Domain.Models.Coworking;
 using Cower.Service.Exceptions;

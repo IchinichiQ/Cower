@@ -1,9 +1,13 @@
 using System.Collections.ObjectModel;
+using Cower.Data.Models;
 using Cower.Data.Repositories;
 using Cower.Domain.Models.Coworking;
+using Cower.Service.Exceptions;
 using Cower.Service.Extensions;
 using Cower.Service.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Cower.Service.Services.Implementation;
 
@@ -40,5 +44,45 @@ public class CoworkingService : ICoworkingService
         return infoDals
             .Select(x => x.ToCoworkingInfo(_imageLinkGenerator))
             .ToArray();
+    }
+
+    public async Task<Coworking> CreateCoworking(CreateCoworkingBl request)
+    {
+        var dal = new AddCoworkingDal(
+            request.Address,
+            request.WorkingTimes
+                .Select(x => new AddCoworkingWorkingTimeDal(
+                    (int)x.DayOfWeek,
+                    x.Open,
+                    x.Close))
+                .ToArray());
+        
+        var coworkingDal = await _coworkingRepository.AddCoworking(dal);
+
+        return coworkingDal.ToCoworking(_imageLinkGenerator);
+    }
+
+    public async Task<Coworking?> UpdateCoworking(UpdateCoworkingBl request)
+    {
+        var dal = new UpdateCoworkingDal(
+            request.Id,
+            request.Address,
+            request.WorkingTimes?
+                .Select(x => new UpdateCoworkingWorkingTimeDal(
+                    (int)x.DayOfWeek,
+                    x.Open,
+                    x.Close))
+                .ToArray());
+        
+        var coworkingDal = await _coworkingRepository.UpdateCoworking(dal);
+
+        return coworkingDal?.ToCoworking(_imageLinkGenerator);
+    }
+
+    public async Task<bool> DeleteCoworking(long id)
+    {
+        var isDeleted = await _coworkingRepository.DeleteCoworking(id);
+
+        return isDeleted;
     }
 }
