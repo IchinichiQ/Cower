@@ -1,6 +1,12 @@
-import {css} from "styled-components";
+import { css } from "styled-components";
+import { colors } from "@/styles/constants";
 
 export const overrides = css`
+  .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: ${colors.dark};
+    border-color: ${colors.dark};
+  }
+
   .ant-popover-inner-content {
     white-space: nowrap;
   }
@@ -12,12 +18,14 @@ export const overrides = css`
   }
 
   .ant-select.styled-select {
+    width: 100%;
 
     & > .ant-select-selector {
       padding-inline: 0 !important;
 
       .ant-select-selection-item {
         font-weight: 600 !important;
+        font-size: 18px;
       }
     }
 
