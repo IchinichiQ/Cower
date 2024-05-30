@@ -24,6 +24,9 @@
 - Курсовой проект
   [docx](documentation/Курсовой_проект.docx)
   [pdf](documentation/Курсовой_проект.pdf)
+- ПМИ
+  [docx](documentation/ПМИ.docx)
+  [pdf](documentation/ПМИ.pdf)
   
 ### Метрики
 [Скриншоты метрик](metrics)
@@ -35,3 +38,8 @@
 
 [Видеопрезентация (2 аттестация)](https://youtu.be/67evfZUgtRQ)  
 Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.pdf)
+
+[Видеопрезентация (2 аттестация)](https://youtu.be/67evfZUgtRQ)  
+Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.pdf)
+
+Презентация с защиты [pptx](documentation/Презентация_защита.pptx) [pdf](documentation/Презентация_защита.pdf)
