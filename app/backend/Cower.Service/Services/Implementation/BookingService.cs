@@ -50,6 +50,15 @@ public class BookingService : IBookingService
             .ToArray();
     }
 
+    public async Task<IReadOnlyCollection<Booking>> GetBookings()
+    {
+        var bookingDals = await _bookingRepository.GetBookings();
+
+        return bookingDals
+            .Select(x => x.ToBooking())
+            .ToArray();
+    }
+
     public async Task<Booking> AddBooking(CreateBookingRequestBL request)
     {
         ValidateCreateBookingRequest(request);

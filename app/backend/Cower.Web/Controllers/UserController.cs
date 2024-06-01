@@ -117,4 +117,27 @@ public class UserController : ControllerBase
                 user.Surname,
                 user.Phone));
     }
+    
+    [HttpGet("{id}")]
+    [Authorize(Roles = AppRoleNames.Admin)]
+    public async Task<ActionResult<UserInfoResponseDto>> GetUser([FromRoute] long id)
+    {
+        var user = await _userService.GetUser(id);
+        if (user == null)
+        {
+            var error = new ErrorDto(
+                ErrorCodes.NOT_FOUND,
+                "Пользователя с таким ID не существует");
+            return NotFound(error);
+        }
+
+        return new UserInfoResponseDto(
+            new UserResponseDto(
+                user.Id,
+                user.Email,
+                user.Role.Name,
+                user.Name,
+                user.Surname,
+                user.Phone));
+    }
 }
