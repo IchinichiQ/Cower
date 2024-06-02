@@ -12,6 +12,7 @@ public class YoomoneyService : IYoomoneyService
     private readonly string PAYMENT_TYPE;
     private readonly string SECRET;
     private readonly bool IS_DEVELOPMENT;
+    private readonly string SUCCESS_URL;
     
     private readonly ILogger<YoomoneyService> _logger;
     private readonly IHttpContextAccessor _contextAccessor;
@@ -26,21 +27,19 @@ public class YoomoneyService : IYoomoneyService
         IS_DEVELOPMENT = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
         RECEIVER = Environment.GetEnvironmentVariable("YOOMONEY_RECEIVER")!;
         SECRET = Environment.GetEnvironmentVariable("YOOMONEY_SECRET")!;
+        SUCCESS_URL = Environment.GetEnvironmentVariable("YOOMONEY_SUCCESS_URL")!;
         PAYMENT_TYPE = "AC";
     }
 
     public async Task<string> GetPaymentUrl(string label, decimal amount)
     {
-        var host = _contextAccessor.HttpContext.Request.Scheme + "://" + _contextAccessor.HttpContext.Request.Host;
-        var successUrl = host.TrimEnd('/') + "/#/payment-result";
-        
         string requestUrl = $"https://yoomoney.ru/quickpay/confirm?" +
                             $"receiver={RECEIVER}&" +
                             $"quickpay-form=button&" +
                             $"paymentType={PAYMENT_TYPE}&" +
                             $"sum={amount}&" +
                             $"label={label}&" +
-                            $"successURL={successUrl}";
+                            $"successURL={SUCCESS_URL}";
 
         HttpClientHandler clientHandler = new HttpClientHandler();
         clientHandler.AllowAutoRedirect = false;
