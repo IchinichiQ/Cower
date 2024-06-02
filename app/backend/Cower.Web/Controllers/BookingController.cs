@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Cower.Domain.Models;
 using Cower.Domain.Models.Booking;
 using Cower.Service.Exceptions;
 using Cower.Service.Models;
@@ -61,8 +63,18 @@ public class BookingController : ControllerBase
     public async Task<ActionResult<BookingsResponseDto>> GetUserBookings()
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+        var userRole = User.Claims.FirstOrDefault(x => x.Type == ClaimsIdentity.DefaultRoleClaimType)!.Value;
 
-        var bookings = await _bookingService.GetUserBookings(long.Parse(userId));
+        IReadOnlyCollection<Booking> bookings;
+
+        if (userRole == AppRoles.Admin.Name)
+        {
+            bookings = await _bookingService.GetBookings();
+        }
+        else
+        {
+            bookings = await _bookingService.GetUserBookings(long.Parse(userId));
+        }
 
         return new BookingsResponseDto
         {

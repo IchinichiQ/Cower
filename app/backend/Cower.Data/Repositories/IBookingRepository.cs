@@ -11,6 +11,7 @@ public interface IBookingRepository
     Task<IReadOnlyCollection<BookingDal>> GetUserBookings(long userId);
     Task<BookingDal?> GetBooking(long id);
     Task<BookingDal?> GetBooking(string label);
+    Task<IReadOnlyCollection<BookingDal>> GetBookings();
     Task<BookingDal> AddBooking(BookingDal booking);
     Task<bool> IsBookingTimeOverlaps(
         long seatId,

@@ -67,6 +67,14 @@ public class BookingRepository : IBookingRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<IReadOnlyCollection<BookingDal>> GetBookings()
+    {
+        return await _db.Bookings
+            .Include(x => x.Payment)
+            .Select(x => x.ToBookingDAL())
+            .ToArrayAsync();
+    }
+
     public async Task<BookingDal> AddBooking(BookingDal booking)
     {
         var entity = booking.ToBookingEntity();
