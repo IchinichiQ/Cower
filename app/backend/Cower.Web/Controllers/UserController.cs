@@ -140,4 +140,43 @@ public class UserController : ControllerBase
                 user.Surname,
                 user.Phone));
     }
+    
+    [HttpPut("me")]
+    [Authorize]
+    public async Task<ActionResult<UserInfoResponseDto>> UpdateUser([FromBody] UpdateUserDto dto)
+    {
+        var validationError = ValidationHelper.Validate(dto);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+        
+        var userId = long.Parse(User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+
+        var bl = new UpdateUserBl(
+            userId,
+            dto.Password,
+            dto.Email,
+            dto.Name,
+            dto.Surname,
+            dto.Phone);
+
+        var user = await _userService.UpdateUser(bl);
+        if (user == null)
+        {
+            var error = new ErrorDto(
+                ErrorCodes.NOT_FOUND,
+                "Авторизованного пользователя не существует");
+            return NotFound(error);
+        }
+
+        return new UserInfoResponseDto(
+            new UserResponseDto(
+                user.Id,
+                user.Email,
+                user.Role.Name,
+                user.Name,
+                user.Surname,
+                user.Phone));
+    }
 }
