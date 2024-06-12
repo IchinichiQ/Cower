@@ -165,4 +165,32 @@ public class BookingRepository : IBookingRepository
 
         return updated;
     }
+
+    public async Task<long> GetSuccessfulBookingsCount(DateOnly startDate, DateOnly endDate)
+    {
+        var startDateTime = new DateTimeOffset(
+            startDate.Year,startDate.Month, startDate.Day, 0, 0, 0, TimeSpan.FromHours(0));
+        var endDateTime = new DateTimeOffset(
+            endDate.Year, endDate.Month, endDate.Day, 0, 0, 0, TimeSpan.FromHours(0));
+
+        return await _db.Bookings
+            .Where(x => x.Status == BookingStatus.Success &&
+                        x.CreatedAt >= startDateTime &&
+                        x.CreatedAt <= endDateTime)
+            .LongCountAsync();
+    }
+
+    public async Task<decimal> GetSuccessfulBookingsPrice(DateOnly startDate, DateOnly endDate)
+    {
+        var startDateTime = new DateTimeOffset(
+            startDate.Year,startDate.Month, startDate.Day, 0, 0, 0, TimeSpan.FromHours(0));
+        var endDateTime = new DateTimeOffset(
+            endDate.Year, endDate.Month, endDate.Day, 0, 0, 0, TimeSpan.FromHours(0));
+
+        return await _db.Bookings
+            .Where(x => x.Status == BookingStatus.Success &&
+                        x.CreatedAt >= startDateTime &&
+                        x.CreatedAt <= endDateTime)
+            .SumAsync(x => x.Price);
+    }
 }

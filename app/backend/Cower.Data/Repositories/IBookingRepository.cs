@@ -22,4 +22,6 @@ public interface IBookingRepository
     Task<int> SetPaymentTimeoutStatus();
     Task<int> SetInProgressStatus();
     Task<int> SetSuccessBookingStatus();
+    Task<long> GetSuccessfulBookingsCount(DateOnly startDate, DateOnly endDate);
+    Task<decimal> GetSuccessfulBookingsPrice(DateOnly startDate, DateOnly endDate);
 }

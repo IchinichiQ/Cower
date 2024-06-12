@@ -100,15 +100,17 @@ builder.Services.AddDbContext<ApplicationContext>((options) => {
     options.UseSnakeCaseNamingConvention();
 });
 
+builder.Services.AddSingleton<IJwtService, JwtService>();
+builder.Services.AddSingleton<IYoomoneyService, YoomoneyService>();
+builder.Services.AddSingleton<IImageLinkGenerator, ImageLinkGenerator>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICoworkingService, CoworkingService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IFloorService, FloorService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ISeatService, SeatService>();
-builder.Services.AddSingleton<IJwtService, JwtService>();
-builder.Services.AddSingleton<IYoomoneyService, YoomoneyService>();
-builder.Services.AddSingleton<IImageLinkGenerator, ImageLinkGenerator>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICoworkingRepository, CoworkingRepository>();
