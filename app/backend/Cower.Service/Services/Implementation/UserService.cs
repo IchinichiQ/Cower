@@ -1,5 +1,6 @@
 using System.Data.SqlClient;
 using System.Text;
+using Cower.Data.Models;
 using Cower.Data.Models.Entities;
 using Cower.Data.Repositories;
 using Cower.Domain.Models;
@@ -58,6 +59,21 @@ public class UserService : IUserService
     public async Task<User?> GetUser(long id)
     {
         var userEntity = await _userRepository.GetUser(id);
+        
+        return userEntity?.ToUser();
+    }
+
+    public async Task<User?> UpdateUser(UpdateUserBl bl)
+    {
+        var dal = new UpdateUserDal(
+            bl.Id,
+            bl.Password == null ? null : Encoding.UTF8.GetBytes(bl.Password),
+            bl.Email,
+            bl.Name,
+            bl.Surname,
+            bl.Phone);
+
+        var userEntity = await _userRepository.UpdateUser(dal);
         
         return userEntity?.ToUser();
     }
