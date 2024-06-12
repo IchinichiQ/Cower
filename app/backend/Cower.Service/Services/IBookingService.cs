@@ -1,4 +1,5 @@
 using Cower.Domain.Models.Booking;
+using Cower.Domain.Models.Statistics;
 using Cower.Service.Models;
 
 namespace Cower.Service.Services;
