@@ -1,4 +1,5 @@
 using System.Data.SqlClient;
+using System.Security.Cryptography;
 using System.Text;
 using Cower.Data.Models;
 using Cower.Data.Models.Entities;
@@ -15,13 +16,17 @@ namespace Cower.Service.Services.Implementation;
 
 public class UserService : IUserService
 {
+    private readonly string PASSWORD_SALT;
+    
     private readonly ILogger<UserService> _logger;
     private readonly IUserRepository _userRepository;
-
+    
     public UserService(ILogger<UserService> logger, IUserRepository userRepository)
     {
         _logger = logger;
         _userRepository = userRepository;
+        
+        PASSWORD_SALT = Environment.GetEnvironmentVariable("PASSWORD_SALT")!;
     }
 
     public async Task<User> RegisterUser(RegisterUserRequestBL requestBl)
@@ -31,7 +36,7 @@ public class UserService : IUserService
             Name = requestBl.Name,
             Surname = requestBl.Surname,
             Email = requestBl.Email,
-            PasswordHash = Encoding.UTF8.GetBytes(requestBl.Password),
+            PasswordHash = HashPassword(requestBl.Password),
             Phone = requestBl.Phone,
             RoleId = AppRoles.User.Id
         };
@@ -49,7 +54,7 @@ public class UserService : IUserService
 
     public async Task<User?> TryLogin(string email, string password)
     {
-        var passwordHash = Encoding.UTF8.GetBytes(password);
+        var passwordHash = HashPassword(password);
 
         var userEntity = await _userRepository.GetUserByCredentials(email, passwordHash);
         
@@ -67,7 +72,7 @@ public class UserService : IUserService
     {
         var dal = new UpdateUserDal(
             bl.Id,
-            bl.Password == null ? null : Encoding.UTF8.GetBytes(bl.Password),
+            bl.Password == null ? null : HashPassword(bl.Password),
             bl.Email,
             bl.Name,
             bl.Surname,
@@ -76,5 +81,13 @@ public class UserService : IUserService
         var userEntity = await _userRepository.UpdateUser(dal);
         
         return userEntity?.ToUser();
+    }
+
+    private byte[] HashPassword(string password)
+    {
+        using var sha256 = SHA256.Create();
+        var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + PASSWORD_SALT));
+        
+        return hash;
     }
 }
