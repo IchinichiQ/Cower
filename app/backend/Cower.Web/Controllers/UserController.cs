@@ -141,7 +141,7 @@ public class UserController : ControllerBase
                 user.Phone));
     }
     
-    [HttpPut("me")]
+    [HttpPatch("me")]
     [Authorize]
     public async Task<ActionResult<UserInfoResponseDto>> UpdateUser([FromBody] UpdateUserDto dto)
     {

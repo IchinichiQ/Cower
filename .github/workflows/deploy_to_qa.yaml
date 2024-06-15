@@ -59,7 +59,7 @@ jobs:
               -e YOOMONEY_SECRET='${{ secrets.YOOMONEY_SECRET }}' \
               -e YOOMONEY_RECEIVER='${{ secrets.YOOMONEY_RECEIVER }}' \
               -e YOOMONEY_SUCCESS_URL='https://${{ vars.SERVER_HOSTNAME }}:${{ vars.FRONTEND_PORT }}${{ vars.YOOMONEY_SUCCESS_PATH }}' \
-              e SMTP_SERVER_ADDRESS='${{ vars.SMTP_SERVER_ADDRESS }}' \
+              -e SMTP_SERVER_ADDRESS='${{ vars.SMTP_SERVER_ADDRESS }}' \
               -e SMTP_SERVER_PORT='${{ vars.SMTP_SERVER_PORT }}' \
               -e SENDER_EMAIL='${{ vars.SENDER_EMAIL }}' \
               -e SMTP_USERNAME='${{ vars.SMTP_USERNAME }}' \
