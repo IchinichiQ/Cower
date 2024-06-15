@@ -59,6 +59,12 @@ jobs:
               -e YOOMONEY_SECRET='${{ secrets.YOOMONEY_SECRET }}' \
               -e YOOMONEY_RECEIVER='${{ secrets.YOOMONEY_RECEIVER }}' \
               -e YOOMONEY_SUCCESS_URL='https://${{ vars.SERVER_HOSTNAME }}:${{ vars.FRONTEND_PORT }}${{ vars.YOOMONEY_SUCCESS_PATH }}' \
+              e SMTP_SERVER_ADDRESS='${{ vars.SMTP_SERVER_ADDRESS }}' \
+              -e SMTP_SERVER_PORT='${{ vars.SMTP_SERVER_PORT }}' \
+              -e SENDER_EMAIL='${{ vars.SENDER_EMAIL }}' \
+              -e SMTP_USERNAME='${{ vars.SMTP_USERNAME }}' \
+              -e SMTP_PASSWORD='${{ secrets.SMTP_PASSWORD }}' \
+              -e RESET_PASSWORD_URL='https://${{ vars.SERVER_HOSTNAME }}:${{ vars.FRONTEND_PORT }}${{ vars.RESET_PASSWORD_PATH }}' \
               -p ${{ vars.BACKEND_PORT }}:8080 \
               -v /cower/files:/cower/files \
               ichinichi/cower_backend

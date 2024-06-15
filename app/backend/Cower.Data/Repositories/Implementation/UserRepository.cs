@@ -31,6 +31,13 @@ public class UserRepository : IUserRepository
             .Include(x => x.Role)
             .FirstOrDefaultAsync(x => x.Email == email && x.PasswordHash == password);
     }
+    
+    public async Task<UserEntity?> GetUserByEmail(string email)
+    {
+        return await _db.Users
+            .Include(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Email == email);
+    }
 
     public async Task<UserEntity> AddUser(UserEntity user)
     {

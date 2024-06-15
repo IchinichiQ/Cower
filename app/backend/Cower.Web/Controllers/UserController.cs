@@ -179,4 +179,49 @@ public class UserController : ControllerBase
                 user.Surname,
                 user.Phone));
     }
+    
+    [HttpPost("send-password-reset-token")]
+    public async Task<ActionResult> RequestPasswordReset([FromBody] SendPasswordResetTokenDto dto)
+    {
+        var validationError = ValidationHelper.Validate(dto);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+        
+        await _userService.SendPasswordResetToken(dto.Email);
+
+        return Ok();
+    }
+    
+    [HttpPost("reset-password")]
+    public async Task<ActionResult> RequestPasswordReset([FromBody] PasswordResetDto dto)
+    {
+        var validationError = ValidationHelper.Validate(dto);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+
+        try
+        {
+            await _userService.ResetPassword(dto.PasswordResetToken, dto.NewPassword);
+        }
+        catch (PasswordResetTokenDoesntExistException)
+        {
+            var error = new ErrorDto(
+                ErrorCodes.PASSWORD_RESET_TOKEN_DOESNT_EXIST,
+                "Переданного токена восстановления пароля не существует");
+            return NotFound(error);
+        }
+        catch (ExpiredPasswordResetTokenException)
+        {
+            var error = new ErrorDto(
+                ErrorCodes.PASSWORD_RESET_TOKEN_EXPIRED,
+                "Срок действия токена восстановления пароля истёк");
+            return BadRequest(error);
+        }
+
+        return Ok();
+    }
 }
