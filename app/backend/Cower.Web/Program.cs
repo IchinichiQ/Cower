@@ -103,6 +103,7 @@ builder.Services.AddDbContext<ApplicationContext>((options) => {
 builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddSingleton<IYoomoneyService, YoomoneyService>();
 builder.Services.AddSingleton<IImageLinkGenerator, ImageLinkGenerator>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICoworkingService, CoworkingService>();
@@ -111,6 +112,7 @@ builder.Services.AddScoped<IFloorService, FloorService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ISeatService, SeatService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+builder.Services.AddScoped<IPasswordResetTokenService, PasswordResetTokenService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICoworkingRepository, CoworkingRepository>();
@@ -118,6 +120,7 @@ builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IFloorRepository, FloorRepository>();
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 
 builder.Services.AddHostedService<UpdatePaymentTimeoutStatusHostedService>();
 builder.Services.AddHostedService<UpdateInProgressStatusHostedService>();
