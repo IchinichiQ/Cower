@@ -180,6 +180,7 @@ public class BookingService : IBookingService
 
     private void ValidateCreateBookingRequest(CreateBookingRequestBL request)
     {
+        var nowTime = TimeOnly.FromDateTime(DateTimeOffset.Now.DateTime);
         var nowDate = DateOnly.FromDateTime(DateTimeOffset.Now.DateTime);
         var dayDiff = request.BookingDate.DayNumber - nowDate.DayNumber;
         
@@ -199,6 +200,11 @@ public class BookingService : IBookingService
         if (request.EndTime.Minute % 10 != 0 || request.StartTime.Minute % 10 != 0 )
         {
             throw new BusinessLogicException("Время окончания и начала бронирования должны быть кратны десяти");
+        }
+        
+        if (dayDiff == 0 && (request.StartTime < nowTime || request.EndTime < nowTime))
+        {
+            throw new BusinessLogicException("Время начала или окончания бронирования не может быть в прошлом");
         }
     }
 }
