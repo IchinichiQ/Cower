@@ -1,10 +1,11 @@
+using Cower.Data.Models.Entities;
 using Cower.Domain.Models.Booking;
 
 namespace Cower.Data.Models;
 
 public sealed record BookingDal(
     long Id,
-    long UserId,
+    UserEntity User,
     long SeatId,
     DateTimeOffset CreatedAt,
     DateOnly BookingDate,
@@ -15,4 +16,5 @@ public sealed record BookingDal(
     int SeatNumber,
     int Floor,
     string CoworkingAddress,
-    PaymentDal? Payment);
+    PaymentDal? Payment,
+    bool IsDiscountApplied);

@@ -4,7 +4,7 @@ namespace Cower.Web.Models;
 
 public class UpdateUserDto
 {
-    [MinLength(8, ErrorMessage = "Пароль должен содержать не менее 8 символов")] //TODO: Check
+    [MinLength(8, ErrorMessage = "Пароль должен содержать не менее 8 символов")]
     public string? Password { get; set; }
     
     [EmailAddress(ErrorMessage = "Некорректный формат Email")]

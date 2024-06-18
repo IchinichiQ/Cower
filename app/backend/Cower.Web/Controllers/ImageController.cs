@@ -3,6 +3,7 @@ using Cower.Service.Exceptions;
 using Cower.Service.Models;
 using Cower.Service.Services;
 using Cower.Web.Extensions;
+using Cower.Web.Helpers;
 using Cower.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -68,6 +69,12 @@ public class ImageController : ControllerBase
     public async Task<ActionResult<ImageDto>> UploadImage(
         [FromForm] UploadImageDto dto)
     {
+        var validationError = ValidationHelper.Validate(dto);
+        if (validationError != null)
+        {
+            return BadRequest(validationError);
+        }
+        
         var ext = Path.GetExtension(dto.Image.FileName).ToLowerInvariant().TrimStart('.');
         if (string.IsNullOrEmpty(ext) || !ExtenstionToMimeType.Keys.Contains(ext))
         {

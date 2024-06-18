@@ -18,6 +18,7 @@ public class BookingEntity
     public int Floor { get; set; }
     public string CoworkingAddress { get; set; } = default!;
     public BookingStatus Status { get; set; }
+    public bool isDiscountApplied { get; set; }
     
     [ForeignKey("SeatId")]
     public CoworkingSeatEntity? Seat { get; set; }

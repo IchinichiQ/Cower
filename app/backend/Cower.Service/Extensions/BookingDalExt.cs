@@ -17,7 +17,7 @@ internal static class BookingDalExt
 
         return new Booking(
             bookingDal.Id,
-            bookingDal.UserId,
+            bookingDal.User.ToUser(),
             bookingDal.SeatId,
             bookingDal.CreatedAt,
             bookingDal.BookingDate,
@@ -28,6 +28,7 @@ internal static class BookingDalExt
             bookingDal.SeatNumber,
             bookingDal.Floor,
             bookingDal.CoworkingAddress,
-            payment);
+            payment,
+            bookingDal.IsDiscountApplied);
     }
 }

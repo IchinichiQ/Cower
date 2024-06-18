@@ -4,8 +4,13 @@ namespace Cower.Service.Extensions;
 
 internal static class BookingStatusExt
 {
-    public static bool CanCancel(this BookingStatus status)
+    public static bool CanUserCancel(this BookingStatus status)
     {
         return status is BookingStatus.AwaitingPayment or BookingStatus.Paid;
+    }
+    
+    public static bool CanAdminCancel(this BookingStatus status)
+    {
+        return status is not BookingStatus.Success and not BookingStatus.Cancelled;
     }
 }

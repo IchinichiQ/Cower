@@ -2,7 +2,7 @@ namespace Cower.Domain.Models.Booking;
 
 public record Booking(
     long Id,
-    long UserId,
+    User User,
     long SeatId,
     DateTimeOffset CreatedAt,
     DateOnly BookingDate,
@@ -13,4 +13,5 @@ public record Booking(
     int SeatNumber,
     int Floor,
     string CoworkingAddress,
-    Payment? Payment);
+    Payment? Payment,
+    bool IsDiscountApplied);

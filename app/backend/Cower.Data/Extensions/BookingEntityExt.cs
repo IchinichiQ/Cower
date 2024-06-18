@@ -15,9 +15,20 @@ internal static class BookingEntityExt
             booking.Payment.IsCompleted,
             booking.Payment.ExpireAt) : null;
 
+        var userDal = new UserEntity
+        {
+            Id = booking.User.Id,
+            Email = booking.User.Email,
+            Name = booking.User.Name,
+            Surname = booking.User.Surname,
+            Phone = booking.User.Phone,
+            RoleId = booking.User.RoleId,
+            Role = booking.User.Role,
+        };
+
         return new BookingDal(
             booking.Id,
-            booking.UserId,
+            userDal,
             booking.SeatId,
             booking.CreatedAt,
             booking.BookingDate,
@@ -28,6 +39,7 @@ internal static class BookingEntityExt
             booking.SeatNumber,
             booking.Floor,
             booking.CoworkingAddress,
-            paymentDAL);
+            paymentDAL,
+            booking.isDiscountApplied);
     }
 }

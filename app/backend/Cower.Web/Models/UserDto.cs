@@ -1,6 +1,6 @@
 namespace Cower.Web.Models;
 
-public record UserResponseDto(
+public record UserDto(
     long Id,
     string Email,
     string Role,

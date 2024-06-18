@@ -67,7 +67,7 @@ public class CoworkingRepository : ICoworkingRepository
                 DayOfWeek = x.DayOfWeek,
                 Open = x.Open,
                 Close = x.Close
-            }).ToArray()
+            }).ToList()
         };
         
         var coworking = await _db.Coworkings.AddAsync(entity);
@@ -92,7 +92,7 @@ public class CoworkingRepository : ICoworkingRepository
                 DayOfWeek = x.DayOfWeek,
                 Open = x.Open,
                 Close = x.Close
-            }).ToArray();
+            }).ToList();
 
         var coworkingEntity = await _db.Coworkings
             .Where(x => x.Id == dal.Id)

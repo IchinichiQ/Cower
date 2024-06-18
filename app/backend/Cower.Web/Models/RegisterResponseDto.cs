@@ -1,5 +1,5 @@
 namespace Cower.Web.Models;
 
 public record RegisterResponseDto(
-    UserResponseDto User,
+    UserDto User,
     string Jwt);

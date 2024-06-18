@@ -162,7 +162,9 @@ public class FloorService : IFloorService
             });
         
         var timeSlots = await _bookingRepository.GetBookingsTimeSlots(date, floorId);
-        var groupedTimeSlots = timeSlots.GroupBy(x => x.SeatId);
+        var groupedTimeSlots = timeSlots
+            .OrderBy(x => x.StartTime)
+            .GroupBy(x => x.SeatId);
         foreach (var groupBySeat in groupedTimeSlots)
         {
             foreach (var bookingSlot in groupBySeat)
@@ -172,9 +174,9 @@ public class FloorService : IFloorService
                     .FirstOrDefault(x => x.ValueRef.To > bookingSlot.StartTime);
 
                 var firstPart = new LinkedListNode<CoworkingSeatsAvailavilityTimeSlotBL>(
-                    new CoworkingSeatsAvailavilityTimeSlotBL(collision.ValueRef.From, bookingSlot.StartTime));
+                    new CoworkingSeatsAvailavilityTimeSlotBL(collision!.ValueRef.From, bookingSlot.StartTime));
                 var secondPart = new LinkedListNode<CoworkingSeatsAvailavilityTimeSlotBL>(
-                    new CoworkingSeatsAvailavilityTimeSlotBL(bookingSlot.EndTime, collision.ValueRef.To));
+                    new CoworkingSeatsAvailavilityTimeSlotBL(bookingSlot.EndTime, collision!.ValueRef.To));
 
                 if (firstPart.ValueRef.From != firstPart.ValueRef.To)
                 {
