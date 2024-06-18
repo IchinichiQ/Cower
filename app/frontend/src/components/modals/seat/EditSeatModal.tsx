@@ -10,16 +10,15 @@ import { colors } from "@/styles/constants";
 
 interface Props {
   open: boolean;
-
+  seat: Seat;
   onSubmit(seat: Seat): void;
-
   close(): void;
 }
 
-export const CreateSeatModal: FC<Props> = ({ close, onSubmit, open }) => {
-  const [number, setNumber] = useState(1);
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(50);
+export const EditSeatModal: FC<Props> = ({ close, seat, onSubmit, open }) => {
+  const [number, setNumber] = useState(seat.number);
+  const [description, setDescription] = useState(seat.description);
+  const [price, setPrice] = useState(seat.price);
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
 
   const handleUpload = (options: UploadRequestOption<number[]>) => {
@@ -27,43 +26,28 @@ export const CreateSeatModal: FC<Props> = ({ close, onSubmit, open }) => {
     setUploadedFile(file as File);
   };
 
-  const handleSubmit = () => {
-    const formData = new FormData();
-    formData.append("image", uploadedFile!);
-    formData.append("type", "seat");
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(uploadedFile!);
-    img.onload = function () {
-      const { width, height } = this as unknown as {
-        width: number;
-        height: number;
-      };
-      axios.post(`${baseUrl}/v1/images`, formData).then((res) => {
-        onSubmit({
-          coworkingId: -1,
-          id: -1,
-          description,
-          price,
-          number,
-          position: {
-            angle: 0,
-            height,
-            width,
-            x: 200,
-            y: 200,
-          },
-          image: res.data,
-        });
-        close();
-      });
-      URL.revokeObjectURL(objectUrl);
-    };
-    img.src = objectUrl;
+  const handleSubmit = async () => {
+    let newImage;
+    if (uploadedFile) {
+      const formData = new FormData();
+      formData.append("image", uploadedFile!);
+      formData.append("type", "seat");
+      const res = await axios.post(`${baseUrl}/v1/images`, formData);
+      newImage = res.data;
+    }
+    onSubmit({
+      ...seat,
+      number,
+      description,
+      price,
+      image: newImage || seat.image,
+    });
+    close();
   };
 
   return (
     <Modal
-      title="Добавить рабочее место"
+      title="Изменить рабочее место"
       open={open}
       onOk={handleSubmit}
       onCancel={close}
@@ -117,15 +101,15 @@ export const CreateSeatModal: FC<Props> = ({ close, onSubmit, open }) => {
         </Flex>
       </Upload>
 
-      {uploadedFile && (
-        <div>
-          <img
-            style={{ maxWidth: "100%" }}
-            src={URL.createObjectURL(uploadedFile)}
-            alt=""
-          />
-        </div>
-      )}
+      <div>
+        <img
+          style={{ maxWidth: "100%" }}
+          src={
+            uploadedFile ? URL.createObjectURL(uploadedFile) : seat.image.url
+          }
+          alt=""
+        />
+      </div>
     </Modal>
   );
 };

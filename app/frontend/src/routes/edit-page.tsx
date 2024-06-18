@@ -21,6 +21,12 @@ import { CreateFloorModal } from "@/components/modals/floor/CreateFloorModal";
 import { NewSeatButton } from "@/components/NewSeatButton";
 import { CreateSeatModal } from "@/components/modals/seat/CreateSeatModal";
 import { SeatButtons } from "@/components/SeatButtons";
+import useModal from "antd/es/modal/useModal";
+import { EditFloorModal } from "@/components/modals/floor/EditFloorModal";
+import { EditSeatModal } from "@/components/modals/seat/EditSeatModal";
+
+const SEAT_MIN_WIDTH = 60;
+const SEAT_MAX_WIDTH = 130;
 
 dayjs.extend(updateLocale);
 dayjs.updateLocale("ru-ru", {
@@ -101,7 +107,7 @@ export const EditPage = () => {
     fetchCoworkings();
   }, []);
 
-  const fetchCoworking = (coworkingId: number) => {
+  const fetchCoworking = (coworkingId: number, preserveFloor = true) => {
     setCoworkingId(coworkingId);
     axios.get(`${baseUrl}/v1/coworkings/${coworkingId}`).then((response) => {
       if ("data" in response) {
@@ -109,7 +115,11 @@ export const EditPage = () => {
         coworking.floors.sort((a: Floor, b: Floor) => a.number - b.number);
         setCoworking(coworking);
         if (coworking.floors.length) {
-          handleFloorChange(coworking.floors[0].id, coworking.floors);
+          console.log("set new floor");
+          handleFloorChange(
+            (preserveFloor ? floor?.id : undefined) ?? coworking.floors[0].id,
+            coworking.floors
+          );
         } else {
           setSelectedFloor(-1);
           setFloor(undefined);
@@ -129,6 +139,7 @@ export const EditPage = () => {
     );
   };
 
+  const [{ confirm }, modalContextHolder] = useModal();
   // coworking
   const [createCoworkingModalOpen, setCreateCoworkingModalOpen] =
     useState(false);
@@ -139,8 +150,17 @@ export const EditPage = () => {
   };
 
   const handleCoworkingDelete = () => {
-    axios.delete(`${baseUrl}/v1/coworkings/${coworkingId}`).then(() => {
-      fetchCoworkings();
+    confirm({
+      title: "Подтвердите действие",
+      content: `Удалить коворкинг: ${coworking?.address}`,
+      okType: "default",
+      okText: "Удалить",
+      cancelText: "Отмена",
+      onOk() {
+        axios.delete(`${baseUrl}/v1/coworkings/${coworkingId}`).then(() => {
+          fetchCoworkings();
+        });
+      },
     });
   };
 
@@ -150,46 +170,98 @@ export const EditPage = () => {
 
   // Floor
   const [createFloorModalOpen, setCreateFloorModalOpen] = useState(false);
+  const [editFloorModalOpen, setEditFloorModalOpen] = useState(false);
 
   const handleFloorCreate = () => {
     setCreateFloorModalOpen(true);
   };
 
-  const handleFloorDelete = () => {};
+  const handleFloorDelete = () => {
+    confirm({
+      title: "Подтвердите действие",
+      content: `Удалить этаж: ${floor?.number}`,
+      okType: "default",
+      okText: "Удалить",
+      cancelText: "Отмена",
+      onOk() {
+        axios.delete(`${baseUrl}/v1/floors/${floor?.id}`).then(() => {
+          fetchCoworking(coworkingId!);
+        });
+      },
+    });
+  };
 
-  const handleFloorEdit = () => {};
+  const handleFloorEdit = () => {
+    setEditFloorModalOpen(true);
+  };
 
   // Seat
   const [seatStatus, setSeatStatus] = useState<"idle" | "new" | "edit">("idle");
-
   const [activeSeat, setActiveSeat] = useState<Seat | undefined>();
-
   const [createSeatModalOpen, setCreateSeatModalOpen] = useState(false);
+  const [editSeatModalOpen, setEditSeatModalOpen] = useState(false);
 
   const handleCreateSeat = () => {
     setCreateSeatModalOpen(true);
   };
 
-  const handleDeleteActiveSeat = () => {};
+  const handleDeleteActiveSeat = () => {
+    confirm({
+      title: "Подтвердите действие",
+      content: `Удалить рабочее место: ${activeSeat?.number}`,
+      okType: "default",
+      okText: "Удалить",
+      cancelText: "Отмена",
+      onOk() {
+        axios.delete(`${baseUrl}/v1/seats/${activeSeat?.id}`).then(() => {
+          setActiveSeat(undefined);
+          setSeatStatus("idle");
+          fetchCoworking(coworkingId!);
+        });
+      },
+    });
+  };
 
-  const handleEditActiveSeat = () => {};
+  const handleEditActiveSeat = () => {
+    setEditSeatModalOpen(true);
+  };
+
+  const handleCancelSeat = () => {
+    setActiveSeat(undefined);
+    setSeatStatus("idle");
+  };
 
   const handleSaveActiveSeat = () => {
     const { id, coworkingId: _, image, ...data } = activeSeat!;
     data.position.x = Math.round(data.position.x);
     data.position.y = Math.round(data.position.y);
     data.position.angle = Math.round(data.position.angle);
-    axios
-      .post(`${baseUrl}/v1/seats`, {
-        ...data,
-        imageId: image.id,
-        floorId: floor!.id,
-      })
-      .then(() => {
-        setActiveSeat(undefined);
-        setSeatStatus("idle");
-        fetchCoworking(coworkingId!);
-      });
+    if (seatStatus === "edit") {
+      axios
+        .patch(`${baseUrl}/v1/seats/${id}`, {
+          ...data,
+          ...data.position,
+          imageId: image.id,
+          floorId: floor!.id,
+        })
+        .then(() => {
+          setActiveSeat(undefined);
+          setSeatStatus("idle");
+          fetchCoworking(coworkingId!);
+        });
+    } else {
+      axios
+        .post(`${baseUrl}/v1/seats`, {
+          ...data,
+          imageId: image.id,
+          floorId: floor!.id,
+        })
+        .then(() => {
+          setActiveSeat(undefined);
+          setSeatStatus("idle");
+          fetchCoworking(coworkingId!);
+        });
+    }
   };
 
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -239,6 +311,7 @@ export const EditPage = () => {
   return (
     <StyledPage>
       {/* Modals */}
+      {modalContextHolder}
 
       {/* Coworking */}
       {createCoworkingModalOpen && (
@@ -266,6 +339,14 @@ export const EditPage = () => {
           close={() => setCreateFloorModalOpen(false)}
         />
       )}
+      {editFloorModalOpen && (
+        <EditFloorModal
+          open={editFloorModalOpen}
+          floor={floor!}
+          onSubmit={() => fetchCoworking(coworkingId!)}
+          close={() => setEditFloorModalOpen(false)}
+        />
+      )}
 
       {/* Seat */}
       {createSeatModalOpen && (
@@ -276,6 +357,14 @@ export const EditPage = () => {
             setSeatStatus("new");
           }}
           close={() => setCreateSeatModalOpen(false)}
+        />
+      )}
+      {editSeatModalOpen && (
+        <EditSeatModal
+          open={editSeatModalOpen}
+          seat={activeSeat!}
+          onSubmit={setActiveSeat}
+          close={() => setEditSeatModalOpen(false)}
         />
       )}
 
@@ -305,7 +394,9 @@ export const EditPage = () => {
                   label: coworking.address,
                   value: coworking.id,
                 }))}
-                onChange={fetchCoworking}
+                onChange={(id: number) => {
+                  fetchCoworking(id, false);
+                }}
               />
             ) : (
               <span style={{ fontSize: 15 }}>Нет коворкингов</span>
@@ -364,9 +455,12 @@ export const EditPage = () => {
                 </div>
 
                 <SeatButtons
-                  onDelete={handleDeleteActiveSeat}
+                  onDelete={
+                    seatStatus === "edit" ? handleDeleteActiveSeat : undefined
+                  }
                   onEdit={handleEditActiveSeat}
                   onCreate={handleSaveActiveSeat}
+                  onCancel={handleCancelSeat}
                 />
               </div>
             )}
@@ -377,39 +471,36 @@ export const EditPage = () => {
           <Map>
             <MapWrapper ref={mapRef}>
               {floor.seats.map((seat) => (
-                <PlaceInfoModal
+                <div
+                  onClick={() => {
+                    if (seatStatus === "idle") {
+                      setActiveSeat(seat);
+                      setSeatStatus("edit");
+                    }
+                  }}
                   key={seat.id}
-                  onSubmit={() => {}}
-                  info={{
-                    place: seat.number,
-                    price: seat.price,
-                    description: seat.description,
+                  style={{
+                    display: activeSeat?.id === seat.id ? "none" : "grid",
+                    placeContent: "center",
+                    position: "absolute",
+                    width: 100,
+                    height: 100,
+                    top: seat.position.y - 50,
+                    left: seat.position.x - 50,
                   }}
                 >
-                  <div
+                  <SeatComponent
+                    $active
                     style={{
-                      display: "grid",
-                      placeContent: "center",
-                      position: "absolute",
-                      width: 100,
-                      height: 100,
-                      top: seat.position.y - 50,
-                      left: seat.position.x - 50,
+                      width: seat.position.width,
+                      height: seat.position.height,
+                      backgroundImage: `url(${seat.image.url})`,
+                      transform: `rotate(${seat.position.angle}deg)`,
+                      transformOrigin: "center",
+                      position: "relative",
                     }}
-                  >
-                    <SeatComponent
-                      $active
-                      style={{
-                        width: seat.position.width,
-                        height: seat.position.height,
-                        backgroundImage: `url(${seat.image.url})`,
-                        transform: `rotate(${seat.position.angle}deg)`,
-                        transformOrigin: "center",
-                        position: "relative",
-                      }}
-                    />
-                  </div>
-                </PlaceInfoModal>
+                  />
+                </div>
               ))}
 
               {activeSeat && (
@@ -442,15 +533,51 @@ export const EditPage = () => {
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleSeatDrop}
                     onWheel={(e) => {
-                      console.log(e);
+                      if (e.shiftKey) {
+                        const s = e.deltaY < 0 ? -1 : 1;
+                        const f =
+                          Math.max(
+                            activeSeat?.position.width,
+                            activeSeat?.position.height
+                          ) /
+                          Math.min(
+                            activeSeat?.position.width,
+                            activeSeat?.position.height
+                          );
+                        let width = activeSeat?.position.width;
+                        let height = activeSeat?.position.height;
+                        if (width < height) {
+                          const mn = width + s;
+                          const mx = Math.round(mn * f);
+                          if (SEAT_MIN_WIDTH <= mx && mx <= SEAT_MAX_WIDTH) {
+                            width = mn;
+                            height = mx;
+                          }
+                        } else {
+                          const mn = height + s;
+                          const mx = Math.round(mn * f);
+                          if (SEAT_MIN_WIDTH <= mx && mx <= SEAT_MAX_WIDTH) {
+                            width = mx;
+                            height = mn;
+                          }
+                        }
+                        setActiveSeat({
+                          ...activeSeat,
+                          position: {
+                            ...activeSeat?.position,
+                            height,
+                            width,
+                          },
+                        });
+                        return;
+                      }
                       let r = activeSeat?.position.angle + e.deltaY / 50;
                       if (r > 360) {
-                        r = r - 360;
+                        r -= 360;
                       }
                       if (r < 0) {
                         r += 360;
                       }
-                      console.log(r);
                       setActiveSeat({
                         ...activeSeat,
                         position: { ...activeSeat?.position, angle: r },

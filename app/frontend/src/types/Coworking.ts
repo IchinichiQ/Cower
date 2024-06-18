@@ -31,6 +31,6 @@ export interface Floor {
   id: number;
   coworkingId: number;
   number: number;
-  image: { url: string };
+  image: { id: number; url: string };
   seats?: Seat[];
 }

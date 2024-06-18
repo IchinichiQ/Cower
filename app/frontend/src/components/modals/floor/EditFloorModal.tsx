@@ -6,43 +6,42 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { UploadRequestOption } from "rc-upload/es/interface";
 import { colors } from "@/styles/constants";
+import { Floor } from "@/types/Coworking";
 
 interface Props {
   open: boolean;
-  coworkingId: number;
+  floor: Floor;
 
   onSubmit(): void;
 
   close(): void;
 }
 
-export const CreateFloorModal: FC<Props> = ({
-  coworkingId,
-  close,
-  onSubmit,
-  open,
-}) => {
-  const [floorNumber, setFloorNumber] = useState(1);
+export const EditFloorModal: FC<Props> = ({ floor, close, onSubmit, open }) => {
+  const [floorNumber, setFloorNumber] = useState(floor.number);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true);
-    const formData = new FormData();
-    formData.append("image", uploadedFile!);
-    formData.append("type", "floor");
-    axios.post(`${baseUrl}/v1/images`, formData).then((res) => {
-      axios
-        .post(`${baseUrl}/v1/floors`, {
-          number: floorNumber,
-          coworkingId,
-          imageId: res.data.id,
-        })
-        .then(() => {
-          setLoading(false);
-          onSubmit();
-          close();
-        });
-    });
+    let newImageId;
+    if (uploadedFile) {
+      const formData = new FormData();
+      formData.append("image", uploadedFile!);
+      formData.append("type", "floor");
+      const res = await axios.post(`${baseUrl}/v1/images`, formData);
+      newImageId = res.data.id;
+    }
+    await axios
+      .patch(`${baseUrl}/v1/floors/${floor.id}`, {
+        number: floorNumber,
+        coworkingId: floor.coworkingId,
+        imageId: newImageId ?? floor.image.id,
+      })
+      .then(() => {
+        setLoading(false);
+        onSubmit();
+        close();
+      });
   };
 
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
@@ -53,12 +52,12 @@ export const CreateFloorModal: FC<Props> = ({
 
   return (
     <Modal
-      title="Добавить этаж"
+      title="Редактировать этаж"
       open={open}
       onOk={handleSubmit}
       onCancel={close}
       okButtonProps={{ loading }}
-      okText="Создать"
+      okText="Сохранить"
       okType="default"
       cancelText="Отмена"
       cancelButtonProps={{
@@ -87,15 +86,15 @@ export const CreateFloorModal: FC<Props> = ({
         </Flex>
       </Upload>
 
-      {uploadedFile && (
-        <div>
-          <img
-            style={{ maxWidth: "100%" }}
-            src={URL.createObjectURL(uploadedFile)}
-            alt=""
-          />
-        </div>
-      )}
+      <div>
+        <img
+          style={{ maxWidth: "100%" }}
+          src={
+            uploadedFile ? URL.createObjectURL(uploadedFile) : floor.image.url
+          }
+          alt=""
+        />
+      </div>
     </Modal>
   );
 };
