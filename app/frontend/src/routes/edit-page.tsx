@@ -1,10 +1,12 @@
 import styled from "styled-components";
 import { colors } from "@/styles/constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import { Flex } from "antd";
+import {
+  faCaretDown,
+  faCircleQuestion,
+} from "@fortawesome/free-solid-svg-icons";
+import { Flex, Popover } from "antd";
 import { MouseEvent, useEffect, useRef, useState } from "react";
-import { PlaceInfoModal } from "@/components/modals/PlaceInfoModal";
 import dayjs from "dayjs";
 import "dayjs/locale/ru.js";
 import updateLocale from "dayjs/plugin/updateLocale";
@@ -24,6 +26,8 @@ import { SeatButtons } from "@/components/SeatButtons";
 import useModal from "antd/es/modal/useModal";
 import { EditFloorModal } from "@/components/modals/floor/EditFloorModal";
 import { EditSeatModal } from "@/components/modals/seat/EditSeatModal";
+import { MapLoader } from "@/components/ui/MapLoader";
+import { minmax } from "@/utils/minmax";
 
 const SEAT_MIN_WIDTH = 60;
 const SEAT_MAX_WIDTH = 130;
@@ -53,6 +57,7 @@ const SidePanel = styled(Flex)`
 `;
 
 const Map = styled("div")`
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
@@ -83,49 +88,64 @@ const SeatComponent = styled("div")<{ $active: boolean }>`
 export const EditPage = () => {
   const user = useAuthorizedUser();
 
+  const [loading, setLoading] = useState(false);
   const [coworkingList, setCoworkingList] = useState<Coworking[]>([]);
   const [coworkingId, setCoworkingId] = useState<number | undefined>();
 
   const fetchCoworkings = (fetchCurrent?: boolean) => {
-    axios.get(`${baseUrl}/v1/coworkings`).then((response) => {
-      if ("data" in response) {
-        setCoworkingList(response.data.coworkings);
-        if (fetchCurrent) {
-          fetchCoworking(coworkingId!);
-        } else if (response.data.coworkings.length) {
-          fetchCoworking(response.data.coworkings[0].id);
-        } else {
-          setCoworking(undefined);
-          setSelectedFloor(-1);
-          setFloor(undefined);
+    setLoading(true);
+    axios
+      .get(`${baseUrl}/v1/coworkings`)
+      .then((response) => {
+        if ("data" in response) {
+          setCoworkingList(response.data.coworkings);
+          if (fetchCurrent) {
+            fetchCoworking(coworkingId!);
+          } else if (response.data.coworkings.length) {
+            fetchCoworking(response.data.coworkings[0].id);
+          } else {
+            setCoworking(undefined);
+            setSelectedFloor(-1);
+            setFloor(undefined);
+          }
         }
-      }
-    });
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     fetchCoworkings();
   }, []);
 
-  const fetchCoworking = (coworkingId: number, preserveFloor = true) => {
+  const fetchCoworking = (
+    coworkingId: number,
+    preserveFloor = true,
+    cb?: () => void
+  ) => {
+    setLoading(true);
     setCoworkingId(coworkingId);
-    axios.get(`${baseUrl}/v1/coworkings/${coworkingId}`).then((response) => {
-      if ("data" in response) {
-        const coworking = response.data;
-        coworking.floors.sort((a: Floor, b: Floor) => a.number - b.number);
-        setCoworking(coworking);
-        if (coworking.floors.length) {
-          console.log("set new floor");
-          handleFloorChange(
-            (preserveFloor ? floor?.id : undefined) ?? coworking.floors[0].id,
-            coworking.floors
-          );
-        } else {
-          setSelectedFloor(-1);
-          setFloor(undefined);
+    axios
+      .get(`${baseUrl}/v1/coworkings/${coworkingId}`)
+      .then((response) => {
+        if ("data" in response) {
+          const coworking = response.data;
+          coworking.floors.sort((a: Floor, b: Floor) => a.number - b.number);
+          setCoworking(coworking);
+          if (coworking.floors.length) {
+            handleFloorChange(
+              (preserveFloor ? floor?.id : undefined) ?? coworking.floors[0].id,
+              coworking.floors
+            );
+          } else {
+            setSelectedFloor(-1);
+            setFloor(undefined);
+          }
         }
-      }
-    });
+      })
+      .finally(() => {
+        setLoading(false);
+        cb?.();
+      });
   };
 
   const [coworking, setCoworking] = useState<Coworking>();
@@ -157,9 +177,13 @@ export const EditPage = () => {
       okText: "Удалить",
       cancelText: "Отмена",
       onOk() {
-        axios.delete(`${baseUrl}/v1/coworkings/${coworkingId}`).then(() => {
-          fetchCoworkings();
-        });
+        setLoading(true);
+        axios
+          .delete(`${baseUrl}/v1/coworkings/${coworkingId}`)
+          .then(() => {
+            fetchCoworkings();
+          })
+          .finally(() => setLoading(false));
       },
     });
   };
@@ -184,9 +208,13 @@ export const EditPage = () => {
       okText: "Удалить",
       cancelText: "Отмена",
       onOk() {
-        axios.delete(`${baseUrl}/v1/floors/${floor?.id}`).then(() => {
-          fetchCoworking(coworkingId!);
-        });
+        setLoading(true);
+        axios
+          .delete(`${baseUrl}/v1/floors/${floor?.id}`)
+          .then(() => {
+            fetchCoworking(coworkingId!);
+          })
+          .finally(() => setLoading(false));
       },
     });
   };
@@ -213,11 +241,15 @@ export const EditPage = () => {
       okText: "Удалить",
       cancelText: "Отмена",
       onOk() {
-        axios.delete(`${baseUrl}/v1/seats/${activeSeat?.id}`).then(() => {
-          setActiveSeat(undefined);
-          setSeatStatus("idle");
-          fetchCoworking(coworkingId!);
-        });
+        setLoading(true);
+        axios
+          .delete(`${baseUrl}/v1/seats/${activeSeat?.id}`)
+          .then(() => {
+            setActiveSeat(undefined);
+            setSeatStatus("idle");
+            fetchCoworking(coworkingId!);
+          })
+          .finally(() => setLoading(false));
       },
     });
   };
@@ -232,6 +264,7 @@ export const EditPage = () => {
   };
 
   const handleSaveActiveSeat = () => {
+    setLoading(true);
     const { id, coworkingId: _, image, ...data } = activeSeat!;
     data.position.x = Math.round(data.position.x);
     data.position.y = Math.round(data.position.y);
@@ -245,9 +278,10 @@ export const EditPage = () => {
           floorId: floor!.id,
         })
         .then(() => {
-          setActiveSeat(undefined);
-          setSeatStatus("idle");
-          fetchCoworking(coworkingId!);
+          fetchCoworking(coworkingId!, true, () => {
+            setActiveSeat(undefined);
+            setSeatStatus("idle");
+          });
         });
     } else {
       axios
@@ -257,9 +291,10 @@ export const EditPage = () => {
           floorId: floor!.id,
         })
         .then(() => {
-          setActiveSeat(undefined);
-          setSeatStatus("idle");
-          fetchCoworking(coworkingId!);
+          fetchCoworking(coworkingId!, true, () => {
+            setActiveSeat(undefined);
+            setSeatStatus("idle");
+          });
         });
     }
   };
@@ -277,15 +312,15 @@ export const EditPage = () => {
       return;
     }
     const rect = mapRef.current!.getBoundingClientRect()!;
-    const x = e.clientX - Number(rect.left);
-    const y = e.clientY - Number(rect.top);
+    const x = minmax(0, Math.round(e.clientX - Number(rect.left)), rect.width);
+    const y = minmax(0, Math.round(e.clientY - Number(rect.top)), rect.height);
     setActiveSeat({
       ...activeSeat!,
       position: { ...activeSeat!.position, x, y },
     });
   };
 
-  const handleSeatDrop = (e: MouseEvent<HTMLDivElement>) => {
+  const handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
     setIsDragging(false);
   };
 
@@ -465,10 +500,45 @@ export const EditPage = () => {
               </div>
             )}
           </div>
+
+          <Flex justify="center">
+            <Popover
+              content={
+                <Flex
+                  vertical
+                  gap={10}
+                  style={{ maxWidth: 400, whiteSpace: "pre-wrap" }}
+                >
+                  <p>
+                    Чтобы изменить рабочее место, нажмите на него один раз.
+                    После этого вам станут доступны опции редактирования.
+                  </p>
+                  <p>
+                    Вы можете менять положение места, перетаскивая его мышкой.
+                  </p>
+                  <p>
+                    Чтобы изменить угол поворота места, прокрутире колесо мыши,
+                    держа курсор над выбранным местом.
+                  </p>
+                  <p>
+                    Чтобы изменить размер места, также воспользуйтесь колесом
+                    мыши, зажав при это клавишу <b>Shift</b>.
+                  </p>
+                </Flex>
+              }
+            >
+              <FontAwesomeIcon
+                cursor="pointer"
+                fontSize={30}
+                icon={faCircleQuestion}
+              />
+            </Popover>
+          </Flex>
         </SidePanel>
 
         {floor?.seats && (
-          <Map>
+          <Map onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
+            {loading && <MapLoader />}
             <MapWrapper ref={mapRef}>
               {floor.seats.map((seat) => (
                 <div
@@ -490,7 +560,7 @@ export const EditPage = () => {
                   }}
                 >
                   <SeatComponent
-                    $active
+                    $active={seatStatus === "idle"}
                     style={{
                       width: seat.position.width,
                       height: seat.position.height,
@@ -498,6 +568,7 @@ export const EditPage = () => {
                       transform: `rotate(${seat.position.angle}deg)`,
                       transformOrigin: "center",
                       position: "relative",
+                      pointerEvents: seatStatus === "idle" ? "all" : "none",
                     }}
                   />
                 </div>
@@ -528,10 +599,7 @@ export const EditPage = () => {
                       cursor: "grab",
                       position: "relative",
                     }}
-                    onMouseUp={handleSeatDrop}
                     onMouseDown={handleSeatDrag}
-                    onMouseMove={handleMouseMove}
-                    onMouseLeave={handleSeatDrop}
                     onWheel={(e) => {
                       if (e.shiftKey) {
                         const s = e.deltaY < 0 ? -1 : 1;
