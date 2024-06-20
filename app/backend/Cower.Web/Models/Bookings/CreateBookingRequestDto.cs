@@ -19,4 +19,7 @@ public class CreateBookingRequestDto
     [Required(ErrorMessage = "Время окончания бронирования не указано")]
     [TimeOnly(ErrorMessage = "Некорректный формат времени окончания бронирования")]
     public string EndTime { get; set; }
+    
+    [Required(ErrorMessage = "Не указана необходимость скидки")]
+    public bool ApplyDiscount { get; set; }
 }

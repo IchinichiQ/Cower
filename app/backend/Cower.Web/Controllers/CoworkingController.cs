@@ -84,7 +84,7 @@ public class CoworkingController : ControllerBase
     
     [HttpPatch("{id}")]
     [Authorize(Roles = AppRoleNames.Admin)]
-    public async Task<ActionResult> UpdateCoworking(
+    public async Task<ActionResult<CoworkingDto>> UpdateCoworking(
         [FromRoute] long id,
         [FromBody] UpdateCoworkingDto dto)
     {
@@ -113,7 +113,7 @@ public class CoworkingController : ControllerBase
             return NotFound(error);
         }
         
-        return Ok(coworking);
+        return Ok(coworking.ToCoworkingDto());
     }
     
     [HttpDelete("{id}")]

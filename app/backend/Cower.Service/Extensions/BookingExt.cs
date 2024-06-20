@@ -1,4 +1,5 @@
 using Cower.Data.Models;
+using Cower.Data.Models.Entities;
 using Cower.Domain.Models.Booking;
 
 namespace Cower.Service.Extensions;
@@ -15,9 +16,14 @@ internal static class BookingExt
             booking.Payment.IsCompleted,
             booking.Payment.ExpireAt) : null;
 
+        var userDal = new UserEntity
+        {
+            Id = booking.User.Id
+        };
+
         return new BookingDal(
             booking.Id,
-            booking.UserId,
+            userDal,
             booking.SeatId,
             booking.CreatedAt,
             booking.BookingDate,
@@ -28,6 +34,7 @@ internal static class BookingExt
             booking.SeatNumber,
             booking.Floor,
             booking.CoworkingAddress,
-            paymentDAL);
+            paymentDAL,
+            booking.IsDiscountApplied);
     }
 }

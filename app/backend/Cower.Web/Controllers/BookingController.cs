@@ -30,12 +30,12 @@ public class BookingController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<BookingResponseDto>> GetBooking([FromRoute] long id)
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+        var userId = User.GetUserId();
 
         Booking? booking;
         try
         {
-            booking = await _bookingService.GetBooking(id, long.Parse(userId));
+            booking = await _bookingService.GetBooking(id, userId);
         }
         catch (ForbiddenException)
         {
@@ -62,8 +62,8 @@ public class BookingController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<BookingsResponseDto>> GetUserBookings()
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
-        var userRole = User.Claims.FirstOrDefault(x => x.Type == ClaimsIdentity.DefaultRoleClaimType)!.Value;
+        var userId = User.GetUserId();
+        var userRole = User.GetRoleName();
 
         IReadOnlyCollection<Booking> bookings;
 
@@ -73,7 +73,7 @@ public class BookingController : ControllerBase
         }
         else
         {
-            bookings = await _bookingService.GetUserBookings(long.Parse(userId));
+            bookings = await _bookingService.GetUserBookings(userId);
         }
 
         return new BookingsResponseDto
@@ -92,15 +92,18 @@ public class BookingController : ControllerBase
         {
             return BadRequest(validationError);
         }
-        
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+
+        var userId = User.GetUserId();
+        var userRole = User.GetRoleName();
 
         Booking booking;
         try
         {
             booking = await _bookingService.AddBooking(new CreateBookingRequestBL(
-                long.Parse(userId),
+                userId,
+                userRole,
                 request.SeatId,
+                request.ApplyDiscount,
                 DateOnly.Parse(request.BookingDate),
                 TimeOnly.Parse(request.StartTime),
                 TimeOnly.Parse(request.EndTime))
@@ -130,19 +133,20 @@ public class BookingController : ControllerBase
     [HttpPost("{id}/cancel")]
     public async Task<ActionResult<CancelBookingResponseDto>> CancelBooking([FromRoute] long id)
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+        var userId = User.GetUserId();
+        var userRole = User.GetRoleName();
 
         Booking? booking;
         try
         {
-            booking = await _bookingService.CancelBooking(id, long.Parse(userId));
+            booking = await _bookingService.CancelBooking(id, userId, userRole);
         }
         catch (ForbiddenException)
         {
             var error = new ErrorDto(
                 ErrorCodes.FORBIDDEN,
                 "Нет прав на отмену этого бронирования");
-            return new ObjectResult(error) { StatusCode = 403};
+            return new ObjectResult(error) { StatusCode = 403 };
         }
         catch (BusinessLogicException e)
         {

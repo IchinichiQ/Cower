@@ -2,6 +2,6 @@ namespace Cower.Domain.Models;
 
 public enum ImageType
 {
-    Floor,
-    Seat
+    Floor = 1,
+    Seat = 2
 }

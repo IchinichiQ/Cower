@@ -3,6 +3,7 @@ using Cower.Domain.Models;
 using Cower.Service.Exceptions;
 using Cower.Service.Models;
 using Cower.Service.Services;
+using Cower.Web.Extensions;
 using Cower.Web.Helpers;
 using Cower.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -13,16 +14,13 @@ namespace Cower.Web.Controllers;
 [Route("api/v1/users")]
 public class UserController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
     private readonly IUserService _userService;
     private readonly IJwtService _jwtService;
 
     public UserController(
-        ILogger<UserController> logger,
         IUserService userService,
         IJwtService jwtService)
     {
-        _logger = logger;
         _userService = userService;
         _jwtService = jwtService;
     }
@@ -60,7 +58,7 @@ public class UserController : ControllerBase
         var jwt = _jwtService.GenerateJwt(user);
 
         return new RegisterResponseDto(
-            new UserResponseDto(
+            new UserDto(
                 user.Id,
                 user.Email,
                 user.Role.Name,
@@ -91,7 +89,7 @@ public class UserController : ControllerBase
         var jwt = _jwtService.GenerateJwt(user);
 
         return new LoginResponseDto(
-            new UserResponseDto(
+            new UserDto(
                 user.Id,
                 user.Email,
                 user.Role.Name,
@@ -105,11 +103,11 @@ public class UserController : ControllerBase
     [Authorize]
     public async Task<UserInfoResponseDto> UserInfo()
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
-        var user = await _userService.GetUser(long.Parse(userId));
+        var userId = User.GetUserId();
+        var user = await _userService.GetUser(userId);
 
         return new UserInfoResponseDto(
-            new UserResponseDto(
+            new UserDto(
                 user.Id,
                 user.Email,
                 user.Role.Name,
@@ -132,7 +130,7 @@ public class UserController : ControllerBase
         }
 
         return new UserInfoResponseDto(
-            new UserResponseDto(
+            new UserDto(
                 user.Id,
                 user.Email,
                 user.Role.Name,
@@ -150,8 +148,8 @@ public class UserController : ControllerBase
         {
             return BadRequest(validationError);
         }
-        
-        var userId = long.Parse(User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+
+        var userId = User.GetUserId();
 
         var bl = new UpdateUserBl(
             userId,
@@ -171,7 +169,7 @@ public class UserController : ControllerBase
         }
 
         return new UserInfoResponseDto(
-            new UserResponseDto(
+            new UserDto(
                 user.Id,
                 user.Email,
                 user.Role.Name,

@@ -10,7 +10,7 @@ internal static class BookingExt
         return new BookingDto
         {
             Id = booking.Id,
-            UserId = booking.UserId,
+            User = booking.User.ToUserDTO(),
             SeatId = booking.SeatId,
             CreatedAt = booking.CreatedAt.ToString("O"),
             BookingDate = booking.BookingDate.ToString("yyyy-MM-dd"),
@@ -22,7 +22,8 @@ internal static class BookingExt
             Price = booking.Price,
             SeatNumber = booking.SeatNumber,
             Floor = booking.Floor,
-            CoworkingAddress = booking.CoworkingAddress
+            CoworkingAddress = booking.CoworkingAddress,
+            IsDiscountApplied = booking.IsDiscountApplied
         };
     }
 }

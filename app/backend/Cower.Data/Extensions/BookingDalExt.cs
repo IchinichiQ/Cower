@@ -17,7 +17,7 @@ public static class BookingDalExt
 
         return new BookingEntity
         {
-            UserId = bookingDal.UserId,
+            UserId = bookingDal.User.Id,
             SeatId = bookingDal.SeatId,
             CreatedAt = bookingDal.CreatedAt,
             BookingDate = bookingDal.BookingDate,
@@ -28,7 +28,8 @@ public static class BookingDalExt
             SeatNumber = bookingDal.SeatNumber,
             Floor = bookingDal.Floor,
             CoworkingAddress = bookingDal.CoworkingAddress,
-            Payment = paymentEntity
+            Payment = paymentEntity,
+            isDiscountApplied = bookingDal.IsDiscountApplied
         };
     }
 }

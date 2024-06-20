@@ -5,7 +5,7 @@ namespace Cower.Web.Models;
 public class BookingDto
 {
     public long Id { get; set; }
-    public long UserId { get; set; }
+    public UserDto User { get; set; }
     public long SeatId { get; set; }
     public string CreatedAt { get; set; }
     public string BookingDate { get; set; }
@@ -18,4 +18,5 @@ public class BookingDto
     public int SeatNumber { get; set; }
     public int Floor { get; set; }
     public string CoworkingAddress { get; set; }
+    public bool IsDiscountApplied { get; set; }
 }

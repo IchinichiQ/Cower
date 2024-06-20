@@ -43,6 +43,8 @@ public class BookingRepository : IBookingRepository
     public async Task<IReadOnlyCollection<BookingDal>> GetUserBookings(long userId)
     {
         return await _db.Bookings
+            .Include(x => x.User)
+            .ThenInclude(x => x.Role)
             .Where(x => x.UserId == userId)
             .Include(x => x.Payment)
             .Select(x => x.ToBookingDAL())
@@ -54,6 +56,8 @@ public class BookingRepository : IBookingRepository
         return await _db.Bookings
             .Where(x => x.Id == id)
             .Include(x => x.Payment)
+            .Include(x => x.User)
+            .ThenInclude(x => x.Role)
             .Select(x => x.ToBookingDAL())
             .FirstOrDefaultAsync();
     }
@@ -71,6 +75,8 @@ public class BookingRepository : IBookingRepository
     {
         return await _db.Bookings
             .Include(x => x.Payment)
+            .Include(x => x.User)
+            .ThenInclude(x => x.Role)
             .Select(x => x.ToBookingDAL())
             .ToArrayAsync();
     }
@@ -80,8 +86,8 @@ public class BookingRepository : IBookingRepository
         var entity = booking.ToBookingEntity();
         _db.Bookings.Add(entity);
         await _db.SaveChangesAsync();
-        
-        return entity.ToBookingDAL();
+
+        return await GetBooking(entity.Id);
     }
 
     public async Task<bool> IsBookingTimeOverlaps(

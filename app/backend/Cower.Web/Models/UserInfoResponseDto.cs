@@ -1,3 +1,3 @@
 namespace Cower.Web.Models;
 
-public record UserInfoResponseDto(UserResponseDto User);
+public record UserInfoResponseDto(UserDto User);

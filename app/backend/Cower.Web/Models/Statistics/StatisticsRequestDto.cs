@@ -14,6 +14,6 @@ public class StatisticsRequestDto
     [DateOnly(ErrorMessage = "Дата окончания передана в неверном формате")]
     public string EndDate { get; set; }
     
-    [Required(ErrorMessage = "Шаг статистики не указан")]
+    [RequiredEnum(ErrorMessage = "Шаг статистики не указан")]
     public StatisticsStep Step { get; set; }
 }

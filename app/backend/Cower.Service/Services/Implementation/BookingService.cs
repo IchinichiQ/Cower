@@ -1,5 +1,7 @@
 using Cower.Data.Models;
+using Cower.Data.Models.Entities;
 using Cower.Data.Repositories;
+using Cower.Domain.Models;
 using Cower.Domain.Models.Booking;
 using Cower.Service.Exceptions;
 using Cower.Service.Extensions;
@@ -10,6 +12,8 @@ namespace Cower.Service.Services.Implementation;
 
 public class BookingService : IBookingService
 {
+    private const decimal DISCOUNT_COEFFICIENT = 0.9m;
+    
     private readonly ILogger<BookingService> _logger;
     private readonly IBookingRepository _bookingRepository;
     private readonly ISeatRepository _seatRepository;
@@ -33,7 +37,7 @@ public class BookingService : IBookingService
     public async Task<Booking?> GetBooking(long id, long userId)
     {
         var bookingDal = await _bookingRepository.GetBooking(id);
-        if (bookingDal != null && bookingDal.UserId != userId)
+        if (bookingDal != null && bookingDal.User.Id != userId)
         {
             throw new ForbiddenException();
         }
@@ -64,6 +68,7 @@ public class BookingService : IBookingService
         ValidateCreateBookingRequest(request);
 
         var now = DateTimeOffset.UtcNow;
+        var userIsAdmin = request.UserRole == AppRoleNames.Admin;
         
         var seat = await _seatRepository.GetSeat(request.SeatId);
         if (seat == null)
@@ -87,6 +92,7 @@ public class BookingService : IBookingService
 
         var bookedHours = (decimal)(request.EndTime - request.StartTime).TotalHours;
         var bookingPrice = Math.Ceiling(seat.Price * bookedHours);
+        bookingPrice = request.ApplyDiscount ? Math.Floor(bookingPrice * DISCOUNT_COEFFICIENT) : bookingPrice;
         
         var label = Guid.NewGuid().ToString();
         var paymentUrl = await _yoomoneyService.GetPaymentUrl(label, bookingPrice);
@@ -96,41 +102,54 @@ public class BookingService : IBookingService
             -1,
             label,
             paymentUrl,
-            false,
+            userIsAdmin,
             now.AddMinutes(10));
 
+        var bookingStatus = userIsAdmin ? BookingStatus.Paid : BookingStatus.AwaitingPayment;
+        
         var bookingDal = new BookingDal(
             -1,
-            request.UserId,
+            new UserEntity
+            {
+                Id = request.UserId
+            },
             request.SeatId,
             now,
             request.BookingDate,
             request.StartTime,
             request.EndTime,
-            BookingStatus.AwaitingPayment,
+            bookingStatus,
             bookingPrice,
             seat.Number,
             seat.FloorNumber,
             coworking.Address,
-            paymentDal);
+            paymentDal,
+            request.ApplyDiscount);
 
         bookingDal = await _bookingRepository.AddBooking(bookingDal);
         return bookingDal.ToBooking();
     }
     
-    public async Task<Booking?> CancelBooking(long id, long userId)
+    public async Task<Booking?> CancelBooking(long id, long userId, string userRole)
     {
         var bookingDal = await _bookingRepository.GetBooking(id);
         if (bookingDal == null)
         {
             return null;
         }
-        if (bookingDal.UserId != userId)
+
+        var userIsAdmin = userRole == AppRoleNames.Admin;
+        
+        if (!userIsAdmin && bookingDal.User.Id != userId)
         {
             throw new ForbiddenException();
         }
 
-        if (!bookingDal.Status.CanCancel())
+        var canCancel = userIsAdmin ?
+            bookingDal.Status.CanAdminCancel() :
+            bookingDal.Status.CanUserCancel();
+        
+        if (!canCancel)
         {
             throw new BusinessLogicException($"Нельзя отменить бронирование в статусе {bookingDal.Status}");
         }
