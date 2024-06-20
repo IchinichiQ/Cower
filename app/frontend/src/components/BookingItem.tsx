@@ -1,12 +1,12 @@
 import styled from "styled-components";
-import { colors } from "@/styles/constants";
-import { Button, Flex } from "antd";
-import { FC, useEffect, useRef, useState } from "react";
-import { Booking, PaymentStatus, PaymentStatusLabel } from "@/types/Booking";
+import {colors} from "@/styles/constants";
+import {Button, Flex} from "antd";
+import {FC, useEffect, useRef, useState} from "react";
+import {Booking, PaymentStatus, PaymentStatusLabel} from "@/types/Booking";
 import axios from "axios";
-import { baseUrl } from "@/api";
-import { UserRole } from "@/types/User";
-import { getTimeDelta } from "@/utils/getTimeDelta";
+import {baseUrl} from "@/api";
+import {UserRole} from "@/types/User";
+import {getTimeDelta} from "@/utils/getTimeDelta";
 
 const StyledItem = styled(Flex)`
   border-radius: 5px;
@@ -22,10 +22,10 @@ interface Props {
 }
 
 export const BookingItem: FC<Props> = ({
-  booking,
-  onCancel,
-  onPaymentTimeExpired,
-}) => {
+                                         booking,
+                                         onCancel,
+                                         onPaymentTimeExpired,
+                                       }) => {
   const {
     bookingDate,
     startTime,
@@ -146,13 +146,13 @@ export const BookingItem: FC<Props> = ({
             {isDiscountApplied && <s>{initialPrice}р.</s>} {price}р.{" "}
           </Flex>
           {isDiscountApplied && (
-            <span style={{ fontSize: 14, whiteSpace: "nowrap" }}>
+            <span style={{fontSize: 14, whiteSpace: "nowrap"}}>
               (студ. скидка)
             </span>
           )}
         </Flex>
         <Flex gap={4}>
-          {status === PaymentStatus.AwaitingPayment &&
+          {status === PaymentStatus.AwaitingPayment && user?.role === UserRole.USER &&
             Number(paymentTimeRemaining) > 0 && (
               <Button onClick={() => window.open(paymentUrl)}>Оплатить</Button>
             )}
@@ -164,5 +164,6 @@ export const BookingItem: FC<Props> = ({
         </Flex>
       </Flex>
     </StyledItem>
-  );
+  )
+    ;
 };
