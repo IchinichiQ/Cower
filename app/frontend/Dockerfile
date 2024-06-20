@@ -27,13 +27,13 @@ RUN rm -rf /usr/local/apache2/htdocs
 COPY --from=build /app/dist /usr/local/apache2/htdocs
 
 # Use ssl
-RUN if [ -f /cower/ssl/certificate.crt ]; then \
-        echo "LoadModule               ssl_module modules/mod_ssl.so" >> /usr/local/apache2/conf/httpd.conf; \
-        echo "SSLEngine                on" >> /usr/local/apache2/conf/httpd.conf; \
-        echo "SSLCertificateFile       /cower/ssl/certificate.crt" >> /usr/local/apache2/conf/httpd.conf; \
-        echo "SSLCertificateKeyFile    /cower/ssl/private.key" >> /usr/local/apache2/conf/httpd.conf; \
-        echo "SSLCertificateChainFile  /cower/ssl/ca_bundle.crt" >> /usr/local/apache2/conf/httpd.conf; \
-    fi
+RUN { \
+    echo "LoadModule               ssl_module modules/mod_ssl.so"; \
+    echo "SSLEngine                on"; \
+    echo "SSLCertificateFile       /cower/ssl/certificate.crt"; \
+    echo "SSLCertificateKeyFile    /cower/ssl/private.key"; \
+    echo "SSLCertificateChainFile  /cower/ssl/ca_bundle.crt"; \
+} | tee -a /usr/local/apache2/conf/httpd.conf
 
 RUN { \
     echo '#!/bin/sh';  \
