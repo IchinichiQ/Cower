@@ -42,7 +42,9 @@
 [Видеопрезентация (2 аттестация)](https://youtu.be/67evfZUgtRQ)  
 Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.pdf)
 
-[Видеопрезентация архитектуры бэкенда](https://youtu.be/67evfZUgtRQ)  
+Презентация к защите [pptx](documentation/Защита.pptx) [pdf](documentation/Защита.pdf)
+
+[Видеопрезентация архитектуры бэкенда](https://youtu.be/VPsnFtl6sxA)  
 
 [Видеопрезентация архитектуры фронтенда](https://youtu.be/67evfZUgtRQ)  
 
