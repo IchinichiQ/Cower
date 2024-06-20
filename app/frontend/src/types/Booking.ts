@@ -1,3 +1,5 @@
+import { User } from "@/types/User";
+
 export interface Booking {
   id: number;
   useId: number;
@@ -6,13 +8,16 @@ export interface Booking {
   bookingDate: string;
   startTime: string;
   endTime: string;
-  status: string;
+  status: PaymentStatus;
   paymentUrl?: string;
   paymentExpireAt?: string;
+  initialPrice?: number;
   price: number;
   seatNumber: number;
   floor: number;
   coworkingAddress: string;
+  isDiscountApplied: boolean;
+  user?: User;
 }
 
 export interface NewBookingInfo {

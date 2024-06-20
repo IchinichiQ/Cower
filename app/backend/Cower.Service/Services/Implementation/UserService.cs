@@ -7,6 +7,7 @@ using Cower.Data.Repositories;
 using Cower.Domain.Models;
 using Cower.Service.Exceptions;
 using Cower.Service.Extensions;
+using Cower.Service.Helpers;
 using Cower.Service.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,6 @@ namespace Cower.Service.Services.Implementation;
 
 public class UserService : IUserService
 {
-    private readonly string PASSWORD_SALT;
     private readonly string RESET_PASSWORD_URL;
     
     private readonly ILogger<UserService> _logger;
@@ -34,8 +34,7 @@ public class UserService : IUserService
         _userRepository = userRepository;
         _passwordResetTokenService = passwordResetTokenService;
         _emailService = emailService;
-
-        PASSWORD_SALT = Environment.GetEnvironmentVariable("PASSWORD_SALT")!;
+        
         RESET_PASSWORD_URL = Environment.GetEnvironmentVariable("RESET_PASSWORD_URL")!;
     }
 
@@ -46,7 +45,7 @@ public class UserService : IUserService
             Name = requestBl.Name,
             Surname = requestBl.Surname,
             Email = requestBl.Email,
-            PasswordHash = HashPassword(requestBl.Password),
+            PasswordHash = PasswordHashingHelper.HashPassword(requestBl.Password),
             Phone = requestBl.Phone,
             RoleId = AppRoles.User.Id
         };
@@ -64,7 +63,7 @@ public class UserService : IUserService
 
     public async Task<User?> TryLogin(string email, string password)
     {
-        var passwordHash = HashPassword(password);
+        var passwordHash = PasswordHashingHelper.HashPassword(password);
 
         var userEntity = await _userRepository.GetUserByCredentials(email, passwordHash);
         
@@ -82,7 +81,7 @@ public class UserService : IUserService
     {
         var dal = new UpdateUserDal(
             bl.Id,
-            bl.Password == null ? null : HashPassword(bl.Password),
+            bl.Password == null ? null : PasswordHashingHelper.HashPassword(bl.Password),
             bl.Email,
             bl.Name,
             bl.Surname,
@@ -129,7 +128,7 @@ public class UserService : IUserService
 
         var updateUserDal = new UpdateUserDal(
             resetToken.User.Id,
-            HashPassword(newPassword),
+            PasswordHashingHelper.HashPassword(newPassword),
             null,
             null,
             null,
@@ -138,13 +137,5 @@ public class UserService : IUserService
         await _userRepository.UpdateUser(updateUserDal);
 
         await _passwordResetTokenService.RemoveToken(token);
-    }
-
-    private byte[] HashPassword(string password)
-    {
-        using var sha256 = SHA256.Create();
-        var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + PASSWORD_SALT));
-        
-        return hash;
     }
 }

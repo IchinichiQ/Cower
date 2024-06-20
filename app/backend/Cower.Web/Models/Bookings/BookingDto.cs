@@ -19,4 +19,5 @@ public class BookingDto
     public int Floor { get; set; }
     public string CoworkingAddress { get; set; }
     public bool IsDiscountApplied { get; set; }
+    public decimal? InitialPrice { get; set; }
 }

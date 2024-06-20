@@ -12,7 +12,7 @@ namespace Cower.Service.Services.Implementation;
 
 public class BookingService : IBookingService
 {
-    private const decimal DISCOUNT_COEFFICIENT = 0.9m;
+    public const decimal DISCOUNT_COEFFICIENT = 0.9m;
     
     private readonly ILogger<BookingService> _logger;
     private readonly IBookingRepository _bookingRepository;

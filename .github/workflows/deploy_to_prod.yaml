@@ -84,6 +84,6 @@ jobs:
               --restart unless-stopped \
               -e BACKEND_ADDRESS='https://${{ vars.SERVER_HOSTNAME }}:${{ vars.BACKEND_PORT }}/api' \
               -p ${{ vars.FRONTEND_PORT }}:80 \
-              -v /etc/ssl/cower:/etc/ssl/cower \
+              -v /cower/ssl:/cower/ssl \
               ichinichi/cower_frontend
               docker image prune -f

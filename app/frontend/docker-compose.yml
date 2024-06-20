@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        BACKEND_ADDRESS: https://replace_me_in_container
+    container_name: cower_frontend_qa
+    restart: unless-stopped
+    environment:
+      BACKEND_ADDRESS: http://${SERVER_HOSTNAME}:${BACKEND_PORT}/api
+    ports:
+      - "${FRONTEND_PORT}:80"
+    volumes:
+      - /cower/ssl:/cower/ssl
+    networks:
+      - cower_network
+
+networks:
+  cower_network:
+    driver: bridge
