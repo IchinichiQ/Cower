@@ -17,6 +17,7 @@ import { ErrorText } from "@/styles/styles";
 import { baseUrl } from "@/api";
 import ym from "react-yandex-metrika";
 import locale from "antd/es/locale/ru_RU";
+import { MapLoader } from "@/components/ui/MapLoader";
 import { UserRole } from "@/types/User";
 import { useAppSelector } from "@/redux";
 
@@ -37,13 +38,15 @@ const Wrapper = styled("div")`
 `;
 
 const SidePanel = styled(Flex)`
-  width: 400px;
+  flex: 0 0 400px;
   border-right: 1px solid ${colors.grid};
   padding: 20px;
+  display: flex !important;
 `;
 
 const Map = styled("div")`
-  width: 100%;
+  position: relative;
+  flex-grow: 1;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -71,15 +74,27 @@ const SeatComponent = styled("div")<{ $active: boolean }>`
 `;
 
 export const HomePage = () => {
-  const [timeFrom, setTimeFrom] = useState(-1);
-  const [timeTo, setTimeTo] = useState(-1);
+  const [timeFrom, setTimeFrom] = useState("");
+  const [timeTo, setTimeTo] = useState("");
   const [date, setDate] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const { user } = useAppSelector((state) => state.user);
   const isAdmin = user?.role === UserRole.ADMIN;
 
   const checkTimeValid = () => {
-    return timeFrom < timeTo || timeFrom === -1 || timeTo === -1;
+    if (!timeFrom || !timeTo) {
+      return true;
+    }
+    const spFrom = timeFrom.split(":");
+    const spTo = timeTo.split(":");
+
+    const openHour = +spFrom[0];
+    const openMinute = +spFrom[1];
+    const closeHour = +spTo[0];
+    const closeMinute = +spTo[1];
+
+    return openHour * 60 + openMinute < closeHour * 60 + closeMinute;
   };
 
   const { setOrder } = useActions();
@@ -111,15 +126,18 @@ export const HomePage = () => {
 
   const handleCoworkingChange = (coworkingId: number) => {
     setCoworkingId(coworkingId);
-    axios.get(`${baseUrl}/v1/coworkings/${coworkingId}`).then((response) => {
-      if ("data" in response) {
-        const coworking = response.data;
-        coworking.floors.sort((a: Floor, b: Floor) => a.number - b.number);
-        setCoworking(coworking);
-        console.log(coworking);
-        handleFloorChange(coworking.floors[0].id, coworking.floors);
-      }
-    });
+    setLoading(true);
+    axios
+      .get(`${baseUrl}/v1/coworkings/${coworkingId}`)
+      .then((response) => {
+        if ("data" in response) {
+          const coworking = response.data;
+          coworking.floors.sort((a: Floor, b: Floor) => a.number - b.number);
+          setCoworking(coworking);
+          handleFloorChange(coworking.floors[0].id, coworking.floors);
+        }
+      })
+      .finally(() => setLoading(false));
   };
 
   const [coworking, setCoworking] = useState<Coworking>();
@@ -141,7 +159,7 @@ export const HomePage = () => {
     if (!dateStr) {
       return;
     }
-    ym("reachGoal", "register");
+    setLoading(true);
     axios
       .get(
         `${baseUrl}/v1/floors/${floor?.id}/availability?date=${dateStr}&${floor!.seats!.map((seat) => `seatIds=${seat.id}`).join("&")}`
@@ -156,30 +174,45 @@ export const HomePage = () => {
             (t) => t.day === weekday
           );
           if (dayWorkingTime) {
-            setTimeFrom(+dayWorkingTime.open.split(":")[0]);
-            setTimeTo(+dayWorkingTime.close.split(":")[0]);
+            setTimeFrom(dayWorkingTime.open);
+            setTimeTo(dayWorkingTime.close);
           }
         }
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const checkSeatAvailable = (seat: Seat) => {
     if (!seatsAvailability[String(seat.id)]) {
       return false;
     }
-    for (const period of seatsAvailability[String(seat.id)]) {
-      const periodFrom = +period.from.split(":")[0];
-      const periodTo = +period.to.split(":")[0];
-      const from = timeFrom;
-      const to = timeTo === -1 ? 24 : timeTo;
-      if (periodFrom <= from && to <= periodTo) {
+    for (const { from, to } of seatsAvailability[String(seat.id)]) {
+      const spFrom = from.split(":");
+      const spTo = to.split(":");
+      const hourFrom = +spFrom[0];
+      const minuteFrom = +spFrom[1];
+      const hourTo = +spTo[0];
+      const minuteTo = +spTo[1];
+      const tFrom = hourFrom * 60 + minuteFrom;
+      const tTo = hourTo * 60 + minuteTo;
+
+      const spSelectedFrom = timeFrom.split(":");
+      const spSelectedTo = timeTo.split(":");
+      const selectedHourFrom = +spSelectedFrom[0];
+      const selectedMinuteFrom = +spSelectedFrom[1];
+      const selectedHourTo = +spSelectedTo[0];
+      const selectedMinuteTo = +spSelectedTo[1];
+      const selectedTimeFrom = selectedHourFrom * 60 + selectedMinuteFrom;
+      const selectedTimeTo = selectedHourTo * 60 + selectedMinuteTo;
+
+      if (selectedTimeFrom <= tFrom && tTo <= selectedTimeTo) {
         return true;
       }
     }
     return false;
   };
 
-  const createTimeOptions = (onClick: (time: number) => void) => {
+  const createTimeOptions = (onClick: (time: string) => void) => {
     const weekday = new Date(date).toLocaleDateString("en", {
       weekday: "long",
     });
@@ -189,18 +222,25 @@ export const HomePage = () => {
     if (!dayWorkingTime) {
       return [];
     }
+
+    const openHour = +dayWorkingTime.open.split(":")[0];
+    const openMinute = +dayWorkingTime.open.split(":")[1];
+    const closeHour = +dayWorkingTime.close.split(":")[0];
+    const closeMinute = +dayWorkingTime.close.split(":")[1];
+
     const timeOptions = [];
-    for (let i = 0; i < 24; i++) {
-      const start = +dayWorkingTime.open.split(":")[0];
-      const end = +dayWorkingTime.close.split(":")[0];
-      if (start <= i && i <= end) {
+    for (let i = openHour; i <= closeHour; i++) {
+      for (let j = 0; j < 60; j += 10) {
+        if (i === openHour && j < openMinute) {
+          continue;
+        }
+        if (i === closeHour && j > closeMinute) {
+          continue;
+        }
+        const t = `${String(i).padStart(2, "0")}:${String(j).padStart(2, "0")}`;
         timeOptions.push({
-          label: (
-            <div onClick={() => onClick(i)}>
-              {String(i).padStart(2, "0")}:00
-            </div>
-          ),
-          key: i,
+          label: <div onClick={() => onClick(t)}>{t}</div>,
+          key: t,
         });
       }
     }
@@ -293,9 +333,7 @@ export const HomePage = () => {
                       >
                         <Flex style={{ cursor: "pointer" }} align="center">
                           <span style={{ marginRight: 10 }}>
-                            {timeFrom === -1
-                              ? "-"
-                              : `${String(timeFrom).padStart(2, "0")}:00`}
+                            {timeFrom || "-"}
                           </span>
                           <FontAwesomeIcon
                             style={{ fontSize: 12 }}
@@ -318,9 +356,7 @@ export const HomePage = () => {
                       >
                         <Flex style={{ cursor: "pointer" }} align="center">
                           <span style={{ marginRight: 10 }}>
-                            {timeTo === -1
-                              ? "-"
-                              : `${String(timeTo).padStart(2, "0")}:00`}
+                            {timeTo || "-"}
                           </span>
                           <FontAwesomeIcon
                             style={{ fontSize: 12 }}
@@ -357,10 +393,11 @@ export const HomePage = () => {
           )}
         </SidePanel>
 
-        {floor?.seats && (
-          <Map>
-            <MapWrapper style={{ pointerEvents: date ? "all" : "none" }}>
-              {floor.seats.map((seat) => (
+        <Map>
+          {loading && <MapLoader dark={false} />}
+          <MapWrapper style={{ pointerEvents: date ? "all" : "none" }}>
+            {floor?.seats &&
+              floor.seats.map((seat) => (
                 <PlaceInfoModal
                   key={seat.id}
                   onSubmit={() => handleCreateOrder(seat)}
@@ -386,7 +423,12 @@ export const HomePage = () => {
                     }}
                   >
                     <SeatComponent
-                      $active={checkTimeValid() && checkSeatAvailable(seat)}
+                      $active={
+                        checkTimeValid() &&
+                        !!timeFrom &&
+                        !!timeTo &&
+                        checkSeatAvailable(seat)
+                      }
                       style={{
                         width: seat.position.width,
                         height: seat.position.height,
@@ -400,15 +442,16 @@ export const HomePage = () => {
                   </div>
                 </PlaceInfoModal>
               ))}
+            {floor && !loading && (
               <img
                 draggable={false}
                 style={{ maxWidth: 800 }}
                 src={floor.image.url}
                 alt="map"
               />
-            </MapWrapper>
-          </Map>
-        )}
+            )}
+          </MapWrapper>
+        </Map>
       </Wrapper>
     </StyledPage>
   );

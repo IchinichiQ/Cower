@@ -1,7 +1,7 @@
 export interface PlaceInfo {
-  date?: string;
-  timeFrom?: number;
-  timeTo?: number;
+  date: string;
+  timeFrom: string;
+  timeTo: string;
   place: number;
   description: string;
   price: number;
