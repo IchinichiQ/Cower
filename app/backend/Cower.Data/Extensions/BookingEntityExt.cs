@@ -5,9 +5,9 @@ namespace Cower.Data.Extensions;
 
 internal static class BookingEntityExt
 {
-    public static BookingDAL ToBookingDAL(this BookingEntity booking)
+    public static BookingDal ToBookingDAL(this BookingEntity booking)
     {
-        var paymentDAL = booking.Payment != null ? new PaymentDAL(
+        var paymentDAL = booking.Payment != null ? new PaymentDal(
             booking.Payment.Id,
             booking.Payment.BookingId,
             booking.Payment.Label,
@@ -15,9 +15,20 @@ internal static class BookingEntityExt
             booking.Payment.IsCompleted,
             booking.Payment.ExpireAt) : null;
 
-        return new BookingDAL(
+        var userDal = new UserEntity
+        {
+            Id = booking.User.Id,
+            Email = booking.User.Email,
+            Name = booking.User.Name,
+            Surname = booking.User.Surname,
+            Phone = booking.User.Phone,
+            RoleId = booking.User.RoleId,
+            Role = booking.User.Role,
+        };
+
+        return new BookingDal(
             booking.Id,
-            booking.UserId,
+            userDal,
             booking.SeatId,
             booking.CreatedAt,
             booking.BookingDate,
@@ -28,6 +39,7 @@ internal static class BookingEntityExt
             booking.SeatNumber,
             booking.Floor,
             booking.CoworkingAddress,
-            paymentDAL);
+            paymentDAL,
+            booking.isDiscountApplied);
     }
 }

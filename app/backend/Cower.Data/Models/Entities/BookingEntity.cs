@@ -18,12 +18,13 @@ public class BookingEntity
     public int Floor { get; set; }
     public string CoworkingAddress { get; set; } = default!;
     public BookingStatus Status { get; set; }
+    public bool isDiscountApplied { get; set; }
     
     [ForeignKey("SeatId")]
-    public CoworkingSeatEntity Seat { get; set; }
+    public CoworkingSeatEntity? Seat { get; set; }
     
     [ForeignKey("UserId")]
-    public UserEntity User { get; set; }
+    public UserEntity? User { get; set; }
     
     [InverseProperty("Booking")]
     public PaymentEntity? Payment { get; set; }

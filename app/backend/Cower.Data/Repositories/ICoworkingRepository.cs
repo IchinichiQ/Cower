@@ -5,7 +5,10 @@ namespace Cower.Data.Repositories;
 
 public interface ICoworkingRepository
 {
-    public Task<CoworkingEntity?> GetCoworking(long id);
-    public Task<IReadOnlyCollection<CoworkingEntity>> GetAllCoworkings();
-    public Task<CoworkingFloorDAL?> GetCoworkingFloor(long coworkingId, int floorNum);
+    public Task<CoworkingDal?> GetCoworking(long id);
+    public Task<CoworkingDal> AddCoworking(AddCoworkingDal dal);
+    public Task<CoworkingDal?> UpdateCoworking(UpdateCoworkingDal dal);
+    public Task<bool> DeleteCoworking(long id);
+    public Task<CoworkingDal?> GetCoworkingByFloorId(long floorId);
+    public Task<IReadOnlyCollection<CoworkingInfoDal>> GetAllCoworkings();
 }

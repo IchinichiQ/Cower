@@ -1,13 +1,16 @@
-import {Flex, Popover} from 'antd';
-import {NavLink, useNavigate} from 'react-router-dom';
-import styled from 'styled-components';
-import {Container} from '@/styles/Container';
-import {useAppSelector} from "@/redux";
-import {colors} from "@/styles/constants";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUser, faArrowRightFromBracket} from '@fortawesome/free-solid-svg-icons';
-import {useActions} from "@/redux/actions";
-import {useState} from "react";
+import { Flex, Popover } from "antd";
+import { NavLink, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { useAppSelector } from "@/redux";
+import { colors } from "@/styles/constants";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowRightFromBracket,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import { useActions } from "@/redux/actions";
+import { useState } from "react";
+import { UserRole } from "@/types/User";
 
 const Link = styled(NavLink)`
   font-size: 1.2rem;
@@ -24,69 +27,100 @@ const StyledNavbar = styled(Flex)`
   padding: 5px 30px;
   background-color: ${colors.darker};
   margin-bottom: 30px;
-`
+`;
 
-const PopoverOption = styled('div')`
+const PopoverOption = styled("div")`
   font-size: 20px;
   font-weight: 600;
   cursor: pointer;
-  transition: .3s;
+  transition: 0.3s;
 
   &:hover {
     color: ${colors.tableBorder};
   }
-`
+`;
 
 export const Navbar = () => {
-  const {user} = useAppSelector(state => state.user);
+  const { user } = useAppSelector((state) => state.user);
   const navigate = useNavigate();
 
-  const {clearUser} = useActions();
+  const { clearUser } = useActions();
   const handleLogout = () => {
     clearUser();
     setPopoverOpen(false);
-  }
+  };
 
-  const [popoverOpen, setPopoverOpen] = useState(false)
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   return (
     <StyledNavbar align="center" justify="space-between">
-      <Flex gap={20} align='center'>
-        <img src="logo.svg" alt="cower"/>
-        <h1 style={{fontFamily: 'Saira Condensed', fontWeight: 700}}>COWËR</h1>
+      <Flex
+        onClick={() => navigate("/home")}
+        style={{ cursor: "pointer" }}
+        gap={20}
+        align="center"
+      >
+        <img src="logo.svg" alt="cower" />
+        <h1 style={{ fontFamily: "Saira Condensed", fontWeight: 700 }}>
+          COWËR
+        </h1>
       </Flex>
       <Flex align="center">
-        {user
-          ?
+        {user ? (
           <Popover
             open={popoverOpen}
             onOpenChange={setPopoverOpen}
-            content={<Flex vertical gap={5}>
-              <PopoverOption onClick={() => {
-                navigate('profile');
-                setPopoverOpen(false);
-              }}>Личный кабинет</PopoverOption>
-              <PopoverOption onClick={() => {
-                navigate('bookings');
-                setPopoverOpen(false);
-              }}>Мои заказы</PopoverOption>
-              <PopoverOption onClick={handleLogout}>
-                <Flex gap={12} align='center'>
-                  <FontAwesomeIcon icon={faArrowRightFromBracket}/>
-                  <span>Выйти</span>
-                </Flex>
-              </PopoverOption>
-            </Flex>}
-            trigger={['click']}
+            content={
+              <Flex vertical gap={5}>
+                <PopoverOption
+                  onClick={() => {
+                    navigate("profile");
+                    setPopoverOpen(false);
+                  }}
+                >
+                  Личный кабинет
+                </PopoverOption>
+                <PopoverOption
+                  onClick={() => {
+                    navigate("bookings");
+                    setPopoverOpen(false);
+                  }}
+                >
+                  {user.role === UserRole.ADMIN
+                    ? "Управление заказами"
+                    : "Мои заказы"}
+                </PopoverOption>
+                {user.role === UserRole.ADMIN && (
+                  <PopoverOption
+                    onClick={() => {
+                      navigate("/statistics");
+                      setPopoverOpen(false);
+                    }}
+                  >
+                    Статистика
+                  </PopoverOption>
+                )}
+                <PopoverOption onClick={handleLogout}>
+                  <Flex gap={12} align="center">
+                    <FontAwesomeIcon icon={faArrowRightFromBracket} />
+                    <span>Выйти</span>
+                  </Flex>
+                </PopoverOption>
+              </Flex>
+            }
+            trigger={["click"]}
           >
-            <FontAwesomeIcon icon={faUser} style={{fontSize: 30, cursor: 'pointer'}}/>
+            <FontAwesomeIcon
+              icon={faUser}
+              style={{ fontSize: 30, cursor: "pointer" }}
+            />
           </Popover>
-          :
+        ) : (
           <>
             <Link to="/sign-in">Вход</Link>
             <Link to="/sign-up">Регистрация</Link>
           </>
-        }
+        )}
       </Flex>
     </StyledNavbar>
   );

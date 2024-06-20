@@ -1,5 +1,7 @@
 using Cower.Data.Models;
+using Cower.Data.Models.Entities;
 using Cower.Data.Repositories;
+using Cower.Domain.Models;
 using Cower.Domain.Models.Booking;
 using Cower.Service.Exceptions;
 using Cower.Service.Extensions;
@@ -10,6 +12,8 @@ namespace Cower.Service.Services.Implementation;
 
 public class BookingService : IBookingService
 {
+    public const decimal DISCOUNT_COEFFICIENT = 0.9m;
+    
     private readonly ILogger<BookingService> _logger;
     private readonly IBookingRepository _bookingRepository;
     private readonly ISeatRepository _seatRepository;
@@ -33,7 +37,7 @@ public class BookingService : IBookingService
     public async Task<Booking?> GetBooking(long id, long userId)
     {
         var bookingDal = await _bookingRepository.GetBooking(id);
-        if (bookingDal != null && bookingDal.UserId != userId)
+        if (bookingDal != null && bookingDal.User.Id != userId)
         {
             throw new ForbiddenException();
         }
@@ -50,11 +54,21 @@ public class BookingService : IBookingService
             .ToArray();
     }
 
+    public async Task<IReadOnlyCollection<Booking>> GetBookings()
+    {
+        var bookingDals = await _bookingRepository.GetBookings();
+
+        return bookingDals
+            .Select(x => x.ToBooking())
+            .ToArray();
+    }
+
     public async Task<Booking> AddBooking(CreateBookingRequestBL request)
     {
         ValidateCreateBookingRequest(request);
 
         var now = DateTimeOffset.UtcNow;
+        var userIsAdmin = request.UserRole == AppRoleNames.Admin;
         
         var seat = await _seatRepository.GetSeat(request.SeatId);
         if (seat == null)
@@ -62,7 +76,7 @@ public class BookingService : IBookingService
             throw new NotFoundException("Рабочее место с таким id не найдено");
         }
 
-        var coworking = await _coworkingRepository.GetCoworking(seat.CoworkingId);
+        var coworking = await _coworkingRepository.GetCoworkingByFloorId(seat.FloorId);
         var workingTime = coworking!.WorkingTimes
             .FirstOrDefault(x => x.DayOfWeek == (int)request.BookingDate.DayOfWeek);
         if (workingTime == null || workingTime.Open > request.StartTime || workingTime.Close < request.EndTime)
@@ -78,50 +92,64 @@ public class BookingService : IBookingService
 
         var bookedHours = (decimal)(request.EndTime - request.StartTime).TotalHours;
         var bookingPrice = Math.Ceiling(seat.Price * bookedHours);
+        bookingPrice = request.ApplyDiscount ? Math.Floor(bookingPrice * DISCOUNT_COEFFICIENT) : bookingPrice;
         
         var label = Guid.NewGuid().ToString();
         var paymentUrl = await _yoomoneyService.GetPaymentUrl(label, bookingPrice);
         
-        var paymentDal = new PaymentDAL(
+        var paymentDal = new PaymentDal(
             -1,
             -1,
             label,
             paymentUrl,
-            false,
+            userIsAdmin,
             now.AddMinutes(10));
 
-        var bookingDal = new BookingDAL(
+        var bookingStatus = userIsAdmin ? BookingStatus.Paid : BookingStatus.AwaitingPayment;
+        
+        var bookingDal = new BookingDal(
             -1,
-            request.UserId,
+            new UserEntity
+            {
+                Id = request.UserId
+            },
             request.SeatId,
             now,
             request.BookingDate,
             request.StartTime,
             request.EndTime,
-            BookingStatus.AwaitingPayment,
+            bookingStatus,
             bookingPrice,
             seat.Number,
-            seat.Floor,
+            seat.FloorNumber,
             coworking.Address,
-            paymentDal);
+            paymentDal,
+            request.ApplyDiscount);
 
         bookingDal = await _bookingRepository.AddBooking(bookingDal);
         return bookingDal.ToBooking();
     }
     
-    public async Task<Booking?> CancelBooking(long id, long userId)
+    public async Task<Booking?> CancelBooking(long id, long userId, string userRole)
     {
         var bookingDal = await _bookingRepository.GetBooking(id);
         if (bookingDal == null)
         {
             return null;
         }
-        if (bookingDal.UserId != userId)
+
+        var userIsAdmin = userRole == AppRoleNames.Admin;
+        
+        if (!userIsAdmin && bookingDal.User.Id != userId)
         {
             throw new ForbiddenException();
         }
 
-        if (!bookingDal.Status.CanCancel())
+        var canCancel = userIsAdmin ?
+            bookingDal.Status.CanAdminCancel() :
+            bookingDal.Status.CanUserCancel();
+        
+        if (!canCancel)
         {
             throw new BusinessLogicException($"Нельзя отменить бронирование в статусе {bookingDal.Status}");
         }
@@ -171,6 +199,7 @@ public class BookingService : IBookingService
 
     private void ValidateCreateBookingRequest(CreateBookingRequestBL request)
     {
+        var nowTime = TimeOnly.FromDateTime(DateTimeOffset.Now.DateTime);
         var nowDate = DateOnly.FromDateTime(DateTimeOffset.Now.DateTime);
         var dayDiff = request.BookingDate.DayNumber - nowDate.DayNumber;
         
@@ -190,6 +219,11 @@ public class BookingService : IBookingService
         if (request.EndTime.Minute % 10 != 0 || request.StartTime.Minute % 10 != 0 )
         {
             throw new BusinessLogicException("Время окончания и начала бронирования должны быть кратны десяти");
+        }
+        
+        if (dayDiff == 0 && (request.StartTime < nowTime || request.EndTime < nowTime))
+        {
+            throw new BusinessLogicException("Время начала или окончания бронирования не может быть в прошлом");
         }
     }
 }

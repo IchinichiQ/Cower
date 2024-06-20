@@ -5,12 +5,12 @@ namespace Cower.Web.Extensions;
 
 internal static class BookingExt
 {
-    public static BookingDTO ToBookingDTO(this Booking booking)
+    public static BookingDto ToBookingDTO(this Booking booking)
     {
-        return new BookingDTO
+        return new BookingDto
         {
             Id = booking.Id,
-            UserId = booking.UserId,
+            User = booking.User.ToUserDTO(),
             SeatId = booking.SeatId,
             CreatedAt = booking.CreatedAt.ToString("O"),
             BookingDate = booking.BookingDate.ToString("yyyy-MM-dd"),
@@ -22,7 +22,9 @@ internal static class BookingExt
             Price = booking.Price,
             SeatNumber = booking.SeatNumber,
             Floor = booking.Floor,
-            CoworkingAddress = booking.CoworkingAddress
+            CoworkingAddress = booking.CoworkingAddress,
+            IsDiscountApplied = booking.IsDiscountApplied,
+            InitialPrice = booking.InitialPrice
         };
     }
 }

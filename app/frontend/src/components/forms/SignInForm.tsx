@@ -1,11 +1,13 @@
-import {FormikErrors, useFormik} from 'formik';
-import {Button, Flex, Input} from 'antd';
-import {useState} from 'react';
-import axios from 'axios';
-import {useActions} from '@/redux/actions';
-import {baseUrl} from '@/api';
-import {ErrorText} from '@/styles/styles';
+import { FormikErrors, useFormik } from "formik";
+import { Button, Flex, Input } from "antd";
+import { useState } from "react";
+import axios from "axios";
+import { useActions } from "@/redux/actions";
+import { baseUrl } from "@/api";
+import { ErrorText } from "@/styles/styles";
 import ym from "react-yandex-metrika";
+import { Link } from "react-router-dom";
+import { colors } from "@/styles/constants";
 
 interface FormValues {
   email: string;
@@ -16,25 +18,25 @@ const validate = (values: FormValues) => {
   const errors: FormikErrors<FormValues> = {};
 
   if (!values.email.length) {
-    errors.email = 'Поле обязательно';
+    errors.email = "Поле обязательно";
   }
 
   if (!values.password.length) {
-    errors.password = 'Поле обязательно';
+    errors.password = "Поле обязательно";
   }
 
   return errors;
-}
+};
 
 const SignInForm = () => {
   const [errors, setErrors] = useState<string[]>([]);
-  const {setUser, setJwt} = useActions();
+  const { setUser, setJwt } = useActions();
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const formik = useFormik<FormValues>({
     initialValues: {
-      email: '',
-      password: ''
+      email: "",
+      password: "",
     },
     validate(values) {
       setSubmitAttempted(true);
@@ -43,20 +45,20 @@ const SignInForm = () => {
     validateOnChange: submitAttempted,
     onSubmit(values) {
       setErrors([]);
-      axios.post(baseUrl + '/user/login', values)
-        .then(res => {
+      axios
+        .post(baseUrl + "/v1/users/login", values)
+        .then((res) => {
           if (res.status === 200) {
             setUser(res.data.user);
             setJwt(res.data.jwt);
             setErrors([]);
           }
-          // ym('97166984','reachGoal','register');
         })
-        .catch(e => {
+        .catch((e) => {
           if (e.response) {
             setErrors(e.response.data.error.details);
           } else {
-            setErrors(['Не удалось авторизоваться']);
+            setErrors(["Не удалось авторизоваться"]);
           }
         });
     },
@@ -87,10 +89,20 @@ const SignInForm = () => {
           />
           <ErrorText>{formik.errors.password}</ErrorText>
         </div>
-        <Button htmlType="submit">Войти</Button>
-        {errors.map((error, index) =>
+        {errors.map((error, index) => (
           <ErrorText key={index}>{error}</ErrorText>
-        )}
+        ))}
+        <Button htmlType="submit">Войти</Button>
+        <Link
+          style={{
+            marginLeft: "auto",
+            color: colors.dark,
+            textDecoration: "underline",
+          }}
+          to="/reset-password"
+        >
+          Забыли пароль?
+        </Link>
       </Flex>
     </form>
   );

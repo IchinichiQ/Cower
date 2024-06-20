@@ -1,3 +1,4 @@
+using Cower.Data.Models;
 using Cower.Data.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -30,6 +31,13 @@ public class UserRepository : IUserRepository
             .Include(x => x.Role)
             .FirstOrDefaultAsync(x => x.Email == email && x.PasswordHash == password);
     }
+    
+    public async Task<UserEntity?> GetUserByEmail(string email)
+    {
+        return await _db.Users
+            .Include(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Email == email);
+    }
 
     public async Task<UserEntity> AddUser(UserEntity user)
     {
@@ -41,5 +49,24 @@ public class UserRepository : IUserRepository
             .LoadAsync();
         
         return user;
+    }
+    
+    public async Task<UserEntity?> UpdateUser(UpdateUserDal dal)
+    {
+        var updated = await _db.Users
+            .Where(x => x.Id == dal.Id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(x => x.PasswordHash, x => dal.PasswordHash ?? x.PasswordHash)
+                .SetProperty(x => x.Email, x => dal.Email ?? x.Email)
+                .SetProperty(x => x.Name, x => dal.Name ?? x.Name)
+                .SetProperty(x => x.Surname, x => dal.Surname ?? x.Surname)
+                .SetProperty(x => x.Phone, x => dal.Phone ?? x.Phone));
+
+        if (updated == 0)
+        {
+            return null;
+        }
+    
+        return await GetUser(dal.Id);
     }
 }

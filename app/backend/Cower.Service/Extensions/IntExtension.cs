@@ -12,8 +12,8 @@ internal static class IntExtension
             4 => DayOfWeek.Thursday,
             5 => DayOfWeek.Friday,
             6 => DayOfWeek.Saturday,
-            7 => DayOfWeek.Sunday,
-            _ => throw new ArgumentException("Invalid day of week number. It should be between 1 and 7."),
+            0 => DayOfWeek.Sunday,
+            _ => throw new ArgumentException("Invalid day of week number. It must be between 0 and 6."),
         };
     }
 }

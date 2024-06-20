@@ -21,44 +21,48 @@ public class BookingRepository : IBookingRepository
         _logger = logger;
         _db = db;
     }
-
-    public async Task<IReadOnlyCollection<BookingTimeSlotDAL>> GetBookingsTimeSlots(
+    
+    public async Task<IReadOnlyCollection<BookingTimeSlotDal>> GetBookingsTimeSlots(
         DateOnly date,
-        long coworkingId,
-        IReadOnlyCollection<long> seatIds)
+        long floorId)
     {
         return await _db.Bookings
-            .Where(x => x.Seat.CoworkingId == coworkingId && 
+            .Include(x => x.Seat)
+            .Where(x => x.Seat != null &&
+                        x.Seat.FloorId == floorId && 
                         x.BookingDate == date && 
                         x.Status != BookingStatus.Cancelled &&
-                        x.Status != BookingStatus.PaymentTimeout &&
-                        seatIds.Any(s => s == x.SeatId))
-            .Select(x => new BookingTimeSlotDAL(
+                        x.Status != BookingStatus.PaymentTimeout)
+            .Select(x => new BookingTimeSlotDal(
                 x.SeatId,
                 x.StartTime,
                 x.EndTime))
             .ToArrayAsync();
     }
 
-    public async Task<IReadOnlyCollection<BookingDAL>> GetUserBookings(long userId)
+    public async Task<IReadOnlyCollection<BookingDal>> GetUserBookings(long userId)
     {
         return await _db.Bookings
+            .Include(x => x.User)
+            .ThenInclude(x => x.Role)
             .Where(x => x.UserId == userId)
             .Include(x => x.Payment)
             .Select(x => x.ToBookingDAL())
             .ToArrayAsync();
     }
 
-    public async Task<BookingDAL?> GetBooking(long id)
+    public async Task<BookingDal?> GetBooking(long id)
     {
         return await _db.Bookings
             .Where(x => x.Id == id)
             .Include(x => x.Payment)
+            .Include(x => x.User)
+            .ThenInclude(x => x.Role)
             .Select(x => x.ToBookingDAL())
             .FirstOrDefaultAsync();
     }
 
-    public async Task<BookingDAL?> GetBooking(string label)
+    public async Task<BookingDal?> GetBooking(string label)
     {
         return await _db.Bookings
             .Include(x => x.Payment)
@@ -67,13 +71,23 @@ public class BookingRepository : IBookingRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<BookingDAL> AddBooking(BookingDAL booking)
+    public async Task<IReadOnlyCollection<BookingDal>> GetBookings()
+    {
+        return await _db.Bookings
+            .Include(x => x.Payment)
+            .Include(x => x.User)
+            .ThenInclude(x => x.Role)
+            .Select(x => x.ToBookingDAL())
+            .ToArrayAsync();
+    }
+
+    public async Task<BookingDal> AddBooking(BookingDal booking)
     {
         var entity = booking.ToBookingEntity();
         _db.Bookings.Add(entity);
         await _db.SaveChangesAsync();
-        
-        return entity.ToBookingDAL();
+
+        return await GetBooking(entity.Id);
     }
 
     public async Task<bool> IsBookingTimeOverlaps(
@@ -94,7 +108,7 @@ public class BookingRepository : IBookingRepository
             .AnyAsync();
     }
 
-    public async Task<BookingDAL?> SetBookingStatus(long id, BookingStatus status)
+    public async Task<BookingDal?> SetBookingStatus(long id, BookingStatus status)
     {
         var entity = await _db.Bookings
             .Where(x => x.Id == id)
@@ -156,5 +170,33 @@ public class BookingRepository : IBookingRepository
                 x.SetProperty(entity => entity.Status, BookingStatus.Success));
 
         return updated;
+    }
+
+    public async Task<long> GetSuccessfulBookingsCount(DateOnly startDate, DateOnly endDate)
+    {
+        var startDateTime = new DateTimeOffset(
+            startDate.Year,startDate.Month, startDate.Day, 0, 0, 0, TimeSpan.FromHours(0));
+        var endDateTime = new DateTimeOffset(
+            endDate.Year, endDate.Month, endDate.Day, 0, 0, 0, TimeSpan.FromHours(0));
+
+        return await _db.Bookings
+            .Where(x => x.Status == BookingStatus.Success &&
+                        x.CreatedAt >= startDateTime &&
+                        x.CreatedAt <= endDateTime)
+            .LongCountAsync();
+    }
+
+    public async Task<decimal> GetSuccessfulBookingsPrice(DateOnly startDate, DateOnly endDate)
+    {
+        var startDateTime = new DateTimeOffset(
+            startDate.Year,startDate.Month, startDate.Day, 0, 0, 0, TimeSpan.FromHours(0));
+        var endDateTime = new DateTimeOffset(
+            endDate.Year, endDate.Month, endDate.Day, 0, 0, 0, TimeSpan.FromHours(0));
+
+        return await _db.Bookings
+            .Where(x => x.Status == BookingStatus.Success &&
+                        x.CreatedAt >= startDateTime &&
+                        x.CreatedAt <= endDateTime)
+            .SumAsync(x => x.Price);
     }
 }

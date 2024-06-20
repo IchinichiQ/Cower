@@ -10,7 +10,6 @@ internal static class UserEntityExt
         return new User(
             userEntity.Id,
             userEntity.Email,
-            userEntity.PasswordHash,
             userEntity.Name,
             userEntity.Surname,
             userEntity.Phone,

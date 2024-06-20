@@ -33,7 +33,7 @@ public class YoomoneyController : ControllerBase
         {
             _logger.LogWarning("Invalid SHA-1 hash in YooMoney notification");
 
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.INVALID_REQUEST_DATA,
                 "Invalid SHA-1 hash");
             return BadRequest(error);

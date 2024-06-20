@@ -5,6 +5,7 @@ import axios from 'axios';
 import {useActions} from '@/redux/actions';
 import {baseUrl} from '@/api';
 import {ErrorText} from "@/styles/styles";
+import ym from "react-yandex-metrika";
 
 interface FormValues {
   name: string;
@@ -24,7 +25,7 @@ const validate = (values: FormValues) => {
   if (!values.password.length) {
     errors.password = 'Поле обязательно';
   } else if (values.password.length < 8) {
-    errors.password = 'Пароль должен содержать минимум 8 символов';
+    errors.password = "Пароль должен содержать минимум 8 символов";
   }
 
   return errors;
@@ -49,11 +50,12 @@ const SignUpForm = () => {
     },
     validateOnChange: submitAttempted,
     onSubmit(values) {
-      axios.post(baseUrl + '/user/register', values)
+      axios.post(baseUrl + '/v1/users/register', values)
         .then(res => {
           setUser(res.data.user);
           setJwt(res.data.jwt);
           setErrors([]);
+          ym('reachGoal','register');
         })
         .catch(e => {
           if (e.response) {

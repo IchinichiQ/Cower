@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Cower.Domain.Models;
 using Cower.Domain.Models.Booking;
 using Cower.Service.Exceptions;
 using Cower.Service.Models;
@@ -26,18 +28,18 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<BookingResponseDTO>> GetBooking([FromRoute] long id)
+    public async Task<ActionResult<BookingResponseDto>> GetBooking([FromRoute] long id)
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+        var userId = User.GetUserId();
 
         Booking? booking;
         try
         {
-            booking = await _bookingService.GetBooking(id, long.Parse(userId));
+            booking = await _bookingService.GetBooking(id, userId);
         }
         catch (ForbiddenException)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.FORBIDDEN,
                 "Нет прав на просмотр этого бронирования");
             return new ObjectResult(error) { StatusCode = 403};
@@ -45,26 +47,36 @@ public class BookingController : ControllerBase
         
         if (booking == null)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.NOT_FOUND,
                 "Бронирования с таким id не существует");
             return NotFound(error);
         }
 
-        return new BookingResponseDTO
+        return new BookingResponseDto
         {
             Booking = booking.ToBookingDTO()
         };
     }
 
     [HttpGet]
-    public async Task<ActionResult<BookingsResponseDTO>> GetUserBookings()
+    public async Task<ActionResult<BookingsResponseDto>> GetUserBookings()
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+        var userId = User.GetUserId();
+        var userRole = User.GetRoleName();
 
-        var bookings = await _bookingService.GetUserBookings(long.Parse(userId));
+        IReadOnlyCollection<Booking> bookings;
 
-        return new BookingsResponseDTO
+        if (userRole == AppRoles.Admin.Name)
+        {
+            bookings = await _bookingService.GetBookings();
+        }
+        else
+        {
+            bookings = await _bookingService.GetUserBookings(userId);
+        }
+
+        return new BookingsResponseDto
         {
             Bookings = bookings
                 .Select(x => x.ToBookingDTO())
@@ -73,22 +85,25 @@ public class BookingController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<ActionResult<CreateBookingResponseDTO>> CreateBooking([FromBody] CreateBookingRequestDTO request)
+    public async Task<ActionResult<CreateBookingResponseDto>> CreateBooking([FromBody] CreateBookingRequestDto request)
     {
         var validationError = ValidationHelper.Validate(request);
         if (validationError != null)
         {
             return BadRequest(validationError);
         }
-        
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+
+        var userId = User.GetUserId();
+        var userRole = User.GetRoleName();
 
         Booking booking;
         try
         {
             booking = await _bookingService.AddBooking(new CreateBookingRequestBL(
-                long.Parse(userId),
+                userId,
+                userRole,
                 request.SeatId,
+                request.ApplyDiscount,
                 DateOnly.Parse(request.BookingDate),
                 TimeOnly.Parse(request.StartTime),
                 TimeOnly.Parse(request.EndTime))
@@ -96,45 +111,46 @@ public class BookingController : ControllerBase
         }
         catch (NotFoundException)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.NOT_FOUND,
                 "Место с таким Id не найдено");
             return NotFound(error);
         }
         catch (BusinessLogicException e)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.INVALID_REQUEST_DATA,
                 e.Message);
             return BadRequest(error);
         }
 
-        return new CreateBookingResponseDTO
+        return new CreateBookingResponseDto
         {
             Booking = booking.ToBookingDTO()
         };
     }
     
     [HttpPost("{id}/cancel")]
-    public async Task<ActionResult<CancelBookingResponseDTO>> CancelBooking([FromRoute] long id)
+    public async Task<ActionResult<CancelBookingResponseDto>> CancelBooking([FromRoute] long id)
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value;
+        var userId = User.GetUserId();
+        var userRole = User.GetRoleName();
 
         Booking? booking;
         try
         {
-            booking = await _bookingService.CancelBooking(id, long.Parse(userId));
+            booking = await _bookingService.CancelBooking(id, userId, userRole);
         }
         catch (ForbiddenException)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.FORBIDDEN,
                 "Нет прав на отмену этого бронирования");
-            return new ObjectResult(error) { StatusCode = 403};
+            return new ObjectResult(error) { StatusCode = 403 };
         }
         catch (BusinessLogicException e)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.INVALID_REQUEST_DATA,
                 e.Message);
             return BadRequest(error);
@@ -142,13 +158,13 @@ public class BookingController : ControllerBase
 
         if (booking == null)
         {
-            var error = new ErrorDTO(
+            var error = new ErrorDto(
                 ErrorCodes.NOT_FOUND,
                 "Бронирования с таким id не существует");
             return NotFound(error);
         }
         
-        return new CancelBookingResponseDTO
+        return new CancelBookingResponseDto
         {
             Booking = booking.ToBookingDTO()
         };

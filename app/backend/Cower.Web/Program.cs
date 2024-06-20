@@ -6,6 +6,7 @@ using Cower.Data;
 using Cower.Data.Repositories;
 using Cower.Data.Repositories.Implementation;
 using Cower.Domain.JWT;
+using Cower.Domain.Models;
 using Cower.Domain.Models.Booking;
 using Cower.Service.Services;
 using Cower.Service.Services.Implementation;
@@ -59,14 +60,25 @@ builder.Services.AddControllers().AddJsonOptions(opts =>
     var enumConverter = new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower);
     opts.JsonSerializerOptions.Converters.Add(enumConverter);
 });
+builder.Services.AddHttpContextAccessor();
 builder.WebHost.UseKestrel(kestrel =>
 {
     var pfxFilePath = "certificate.pfx";
     var pfxPassword = Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD");
 
+    bool useHttps = !string.IsNullOrEmpty(pfxPassword);
+    if (!useHttps)
+    {
+        Log.Warning("HTTPS is disabled. To enable it, set the CERTIFICATE_PASSWORD environment variable.");
+    }
+    
     kestrel.Listen(IPAddress.Any, 8080, listenOptions => {
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-        listenOptions.UseHttps(pfxFilePath, pfxPassword);
+
+        if (useHttps)
+        {
+            listenOptions.UseHttps(pfxFilePath, pfxPassword);
+        }
     });
 });
 
@@ -91,28 +103,57 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 var dbDataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 dbDataSourceBuilder.MapEnum<BookingStatus>();
+dbDataSourceBuilder.MapEnum<ImageType>();
 var dbDataSource = dbDataSourceBuilder.Build();
 builder.Services.AddDbContext<ApplicationContext>((options) => {
     options.UseNpgsql(dbDataSource);
     options.UseSnakeCaseNamingConvention();
 });
 
+builder.Services.AddSingleton<IJwtService, JwtService>();
+builder.Services.AddSingleton<IYoomoneyService, YoomoneyService>();
+builder.Services.AddSingleton<IImageLinkGenerator, ImageLinkGenerator>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICoworkingService, CoworkingService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
-builder.Services.AddSingleton<IJwtService, JwtService>();
-builder.Services.AddSingleton<IYoomoneyService, YoomoneyService>();
+builder.Services.AddScoped<IFloorService, FloorService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<ISeatService, SeatService>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+builder.Services.AddScoped<IPasswordResetTokenService, PasswordResetTokenService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICoworkingRepository, CoworkingRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IFloorRepository, FloorRepository>();
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 
 builder.Services.AddHostedService<UpdatePaymentTimeoutStatusHostedService>();
 builder.Services.AddHostedService<UpdateInProgressStatusHostedService>();
 builder.Services.AddHostedService<UpdateSuccessStatusHostedService>();
 
 var app = builder.Build();
+
+// Apply migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    
+    try
+    {
+        var context = services.GetRequiredService<ApplicationContext>();
+        context.Database.Migrate();
+        Log.Information("Migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Log.Error($"An error occurred while applying migrations: {ex.Message}");
+    }
+}
 
 app.UseExceptionHandler(new ExceptionHandlerOptions 
 {

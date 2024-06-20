@@ -24,9 +24,12 @@
 - Курсовой проект
   [docx](documentation/Курсовой_проект.docx)
   [pdf](documentation/Курсовой_проект.pdf)
-- ПМИ
-  [docx](documentation/ПМИ.docx)
-  [pdf](documentation/ПМИ.pdf)
+- Программа и методика испытаний
+  [docx](documentation/Программа_и_методика_испытаний.docx)
+  [pdf](documentation/Программа_и_методика_испытаний.pdf)
+- Протокол проведения испытаний
+  [docx](documentation/Протокол_проведения_испытаний.docx)
+  [pdf](documentation/Протокол_проведения_испытаний.pdf)
   
 ### Метрики
 [Скриншоты метрик](metrics)
@@ -39,7 +42,21 @@
 [Видеопрезентация (2 аттестация)](https://youtu.be/67evfZUgtRQ)  
 Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.pdf)
 
-[Видеопрезентация (2 аттестация)](https://youtu.be/67evfZUgtRQ)  
-Презентация [pptx](documentation/Second.pptx) [pdf](documentation/Second.pdf)
+Презентация к защите [pptx](documentation/Защита.pptx) [pdf](documentation/Защита.pdf)
 
-Презентация с защиты [pptx](documentation/Презентация_защита.pptx) [pdf](documentation/Презентация_защита.pdf)
+[Видеопрезентация архитектуры бэкенда](https://youtu.be/VPsnFtl6sxA)  
+
+[Видеопрезентация архитектуры фронтенда](https://youtu.be/kFqCJzGEbOM)  
+
+## Запуск приложения
+Приложениe использует docker.  
+Для запуска бэкенда необходимо ввести следующую команду в папке `/app/backend`:
+```
+docker compose up -d
+```  
+Для запуска фронтенда аналогичную команду, но в папке `/app/frontend`.
+
+Конфигурация приложения содержится в файлах `.env`, которые можно редактировать в текстовом редакторе. Для использования ssl необходимо:
+- Для бэкенда добавить сертификат в формате `pfx` в папку `/app/backend/Cower.Web`, а также указать пароль от него в файле `/app/backend/.env`
+- Для фронтенда добавить файлы `certificate.crt`, `private.key` и `ca_bundle.crt` в папку `/cower/ssl` на хост машине
+

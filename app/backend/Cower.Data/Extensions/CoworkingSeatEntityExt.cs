@@ -5,16 +5,20 @@ namespace Cower.Data.Extensions;
 
 internal static class CoworkingSeatEntityExt
 {
-    public static SeatDAL ToDal(this CoworkingSeatEntity entity)
+    public static CoworkingSeatDal ToSeatDal(this CoworkingSeatEntity entity)
     {
-        return new SeatDAL(
+        return new CoworkingSeatDal(
             entity.Id,
-            entity.CoworkingId,
-            entity.Floor,
-            entity.Price,
-            entity.ImageFilename,
-            entity.Description,
+            entity.FloorId,
             entity.Number,
-            entity.Coworking);
+            entity.Floor.Number,
+            entity.Price,
+            entity.Description,
+            entity.X,
+            entity.Y,
+            entity.Width,
+            entity.Height,
+            entity.Angle,
+            entity.Image.ToImageDal());
     }
 }

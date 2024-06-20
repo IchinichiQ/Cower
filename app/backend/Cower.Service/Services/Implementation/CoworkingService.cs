@@ -1,9 +1,13 @@
 using System.Collections.ObjectModel;
+using Cower.Data.Models;
 using Cower.Data.Repositories;
 using Cower.Domain.Models.Coworking;
+using Cower.Service.Exceptions;
 using Cower.Service.Extensions;
 using Cower.Service.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Cower.Service.Services.Implementation;
 
@@ -12,97 +16,73 @@ public class CoworkingService : ICoworkingService
     private readonly ILogger<CoworkingService> _logger;
     private readonly ICoworkingRepository _coworkingRepository;
     private readonly IBookingRepository _bookingRepository;
+    private readonly IImageLinkGenerator _imageLinkGenerator;
 
     public CoworkingService(
         ILogger<CoworkingService> logger,
         ICoworkingRepository coworkingRepository,
-        IBookingRepository bookingRepository)
+        IBookingRepository bookingRepository,
+        IImageLinkGenerator imageLinkGenerator)
     {
         _logger = logger;
         _coworkingRepository = coworkingRepository;
         _bookingRepository = bookingRepository;
+        _imageLinkGenerator = imageLinkGenerator;
     }
     
     public async Task<Coworking?> GetCoworking(long id)
     {
-        var coworkingEntity = await _coworkingRepository.GetCoworking(id);
+        var dal = await _coworkingRepository.GetCoworking(id);
 
-        return coworkingEntity?.ToCoworking();
+        return dal?.ToCoworking(_imageLinkGenerator);
     }
 
-    public async Task<IReadOnlyCollection<Coworking>> GetAllCoworkings()
+    public async Task<IReadOnlyCollection<CoworkingInfo>> GetAllCoworkings()
     {
-        var coworkingEntities = await _coworkingRepository.GetAllCoworkings();
+        var infoDals = await _coworkingRepository.GetAllCoworkings();
 
-        return coworkingEntities
-            .Select(x => x.ToCoworking())
+        return infoDals
+            .Select(x => x.ToCoworkingInfo(_imageLinkGenerator))
             .ToArray();
     }
 
-    public async Task<CoworkingFloor?> GetCoworkingFloor(long coworkingId, int floorNum)
+    public async Task<Coworking> CreateCoworking(CreateCoworkingBl request)
     {
-        var floorDal = await _coworkingRepository.GetCoworkingFloor(coworkingId, floorNum);
+        var dal = new AddCoworkingDal(
+            request.Address,
+            request.WorkingTimes
+                .Select(x => new AddCoworkingWorkingTimeDal(
+                    (int)x.DayOfWeek,
+                    x.Open,
+                    x.Close))
+                .ToArray());
+        
+        var coworkingDal = await _coworkingRepository.AddCoworking(dal);
 
-        return floorDal?.ToCoworkingFloor();
+        return coworkingDal.ToCoworking(_imageLinkGenerator);
     }
 
-    public async Task<CoworkingSeatsAvailavilityResponseBL?> GetSeatsAvailability(
-        DateOnly date,
-        long coworkingId,
-        IReadOnlyCollection<long> seatIds)
+    public async Task<Coworking?> UpdateCoworking(UpdateCoworkingBl request)
     {
-        var coworking = await _coworkingRepository.GetCoworking(coworkingId);
-        if (coworking == null)
-        {
-            return null;
-        }
-
-        var workingTime = coworking.WorkingTimes
-            .FirstOrDefault(x => x.DayOfWeek == (int)date.DayOfWeek);
-        var availability = new Dictionary<long, LinkedList<CoworkingSeatsAvailavilityTimeSlotBL>>();
-        foreach (var seatId in seatIds)
-        {
-            availability[seatId] = new LinkedList<CoworkingSeatsAvailavilityTimeSlotBL>();
-            if (workingTime != null)
-            {
-                availability[seatId]
-                    .AddFirst(new CoworkingSeatsAvailavilityTimeSlotBL(workingTime.Open, workingTime.Close));
-            }
-        }
+        var dal = new UpdateCoworkingDal(
+            request.Id,
+            request.Address,
+            request.WorkingTimes?
+                .Select(x => new UpdateCoworkingWorkingTimeDal(
+                    (int)x.DayOfWeek,
+                    x.Open,
+                    x.Close))
+                .ToArray());
         
-        var timeSlots = await _bookingRepository.GetBookingsTimeSlots(date, coworkingId, seatIds);
-        var groupedTimeSlots = timeSlots.GroupBy(x => x.SeatId);
-        
-        foreach (var groupBySeat in groupedTimeSlots)
-        {
-            foreach (var bookingSlot in groupBySeat)
-            {
-                var collision = availability[groupBySeat.Key]
-                    .Nodes()
-                    .FirstOrDefault(x => x.ValueRef.To > bookingSlot.StartTime);
+        var coworkingDal = await _coworkingRepository.UpdateCoworking(dal);
 
-                var firstPart = new LinkedListNode<CoworkingSeatsAvailavilityTimeSlotBL>(
-                    new CoworkingSeatsAvailavilityTimeSlotBL(collision.ValueRef.From, bookingSlot.StartTime));
-                var secondPart = new LinkedListNode<CoworkingSeatsAvailavilityTimeSlotBL>(
-                    new CoworkingSeatsAvailavilityTimeSlotBL(bookingSlot.EndTime, collision.ValueRef.To));
+        return coworkingDal?.ToCoworking(_imageLinkGenerator);
+    }
 
-                if (firstPart.ValueRef.From != firstPart.ValueRef.To)
-                {
-                    availability[groupBySeat.Key].AddAfter(collision, firstPart);
-                }
-                if (secondPart.ValueRef.From != secondPart.ValueRef.To)
-                {
-                    availability[groupBySeat.Key].AddAfter(collision, secondPart);
-                }
-                
-                availability[groupBySeat.Key].Remove(collision);
-            }
-        }
+    public async Task<bool> DeleteCoworking(long id)
+    {
+        var isDeleted = await _coworkingRepository.DeleteCoworking(id);
 
-        var dict = availability.ToDictionary(
-            x => x.Key, 
-            x => (IReadOnlyCollection<CoworkingSeatsAvailavilityTimeSlotBL>)x.Value.OrderBy(x => x.From).ToList());
-        
-        return new CoworkingSeatsAvailavilityResponseBL(date, dict);
+        return isDeleted;
     }
 }

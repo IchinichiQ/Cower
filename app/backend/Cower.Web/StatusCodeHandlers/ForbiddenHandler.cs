@@ -11,7 +11,7 @@ public static class FordbiddenHandler
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
-        var dto = new ErrorDTO(
+        var dto = new ErrorDto(
             ErrorCodes.FORBIDDEN,
             "Доступ к ресурсу запрещен");
         var json = JsonSerializer.Serialize(dto, new JsonSerializerOptions

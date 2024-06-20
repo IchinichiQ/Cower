@@ -1,24 +1,47 @@
 version: '3.8'
 
 services:
-  cower:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - CERTIFICATE_PASSWORD=${secrets:CERTIFICATE_PASSWORD}
-      - JWT_KEY=${secrets:JWT_KEY}
-      - DB_CONNECTION_STRING=${secrets:DB_CONNECTION_STRING}
-    ports:
-      - "8080:8080"
-    build:
-      context: ./Cower
-      dockerfile: Dockerfile
-  db:
+  cower_db:
     image: postgres
+    container_name: cower_db
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${secrets:DB_USER}
-      POSTGRES_PASSWORD: ${secrets:DB_PASSWORD}
       POSTGRES_DB: cower
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
+    networks:
+      - cower_network
+
+  backend:
+    build: .
+    container_name: cower_backend
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      CERTIFICATE_PASSWORD: ${CERTIFICATE_PASSWORD}
+      JWT_KEY: ${JWT_KEY}
+      PASSWORD_SALT: ${PASSWORD_SALT}
+      DB_CONNECTION_STRING: ${DB_CONNECTION_STRING}
+      YOOMONEY_SECRET: ${YOOMONEY_SECRET}
+      YOOMONEY_RECEIVER: ${YOOMONEY_RECEIVER}
+      YOOMONEY_SUCCESS_URL: http://${SERVER_HOSTNAME}:${FRONTEND_PORT}${YOOMONEY_SUCCESS_PATH}
+      SMTP_SERVER_ADDRESS: ${SMTP_SERVER_ADDRESS}
+      SMTP_SERVER_PORT: ${SMTP_SERVER_PORT}
+      SENDER_EMAIL: ${SENDER_EMAIL}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      RESET_PASSWORD_URL: http://${SERVER_HOSTNAME}:${FRONTEND_PORT}${RESET_PASSWORD_PATH}
+    ports:
+      - "${BACKEND_PORT}:8080"
+    depends_on:
+      - cower_db
     volumes:
-      - /cower/data:/var/lib/postgresql/data
+      - /cower/files:/cower/files
+    networks:
+      - cower_network
+
+networks:
+  cower_network:
+    driver: bridge
