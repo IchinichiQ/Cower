@@ -18,6 +18,7 @@ import { YMInitializer } from "react-yandex-metrika";
 import { AdminOnlyLayout } from "@/security/AdminOnlyLayout";
 import { EditPage } from "@/routes/edit-page";
 import { ResetPasswordPage } from "@/routes/reset-password-page";
+import { StatisticsPage } from "@/routes/statistics-page";
 
 const router = createHashRouter([
   {
@@ -72,6 +73,10 @@ const router = createHashRouter([
                 path: "/edit",
                 element: <EditPage />,
               },
+              {
+                path: "/statistics",
+                element: <StatisticsPage />,
+              },
             ],
           },
           {
@@ -96,5 +101,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <RouterProvider router={router} />
       </PersistGate>
     </Provider>
-  </>,
+  </>
 );

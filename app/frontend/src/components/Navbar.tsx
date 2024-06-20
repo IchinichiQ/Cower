@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useActions } from "@/redux/actions";
 import { useState } from "react";
+import { UserRole } from "@/types/User";
 
 const Link = styled(NavLink)`
   font-size: 1.2rem;
@@ -85,8 +86,20 @@ export const Navbar = () => {
                     setPopoverOpen(false);
                   }}
                 >
-                  Мои заказы
+                  {user.role === UserRole.ADMIN
+                    ? "Управление заказами"
+                    : "Мои заказы"}
                 </PopoverOption>
+                {user.role === UserRole.ADMIN && (
+                  <PopoverOption
+                    onClick={() => {
+                      navigate("/statistics");
+                      setPopoverOpen(false);
+                    }}
+                  >
+                    Статистика
+                  </PopoverOption>
+                )}
                 <PopoverOption onClick={handleLogout}>
                   <Flex gap={12} align="center">
                     <FontAwesomeIcon icon={faArrowRightFromBracket} />
