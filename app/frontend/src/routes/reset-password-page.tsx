@@ -102,7 +102,7 @@ export const ResetPasswordPage = () => {
               disabled={!(newPassword && newPassword === confirmNewPassword)}
               style={{ maxWidth: 400 }}
             >
-              Отправить письмо на почту
+              Сохранить
             </Button>
           </Flex>
         )
