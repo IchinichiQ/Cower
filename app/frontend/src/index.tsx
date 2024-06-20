@@ -17,6 +17,7 @@ import { PaymentResultPage } from "@/routes/payment-result-page";
 import { YMInitializer } from "react-yandex-metrika";
 import { AdminOnlyLayout } from "@/security/AdminOnlyLayout";
 import { EditPage } from "@/routes/edit-page";
+import { ResetPasswordPage } from "@/routes/reset-password-page";
 
 const router = createHashRouter([
   {
@@ -30,6 +31,10 @@ const router = createHashRouter([
       {
         path: "home",
         element: <HomePage />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPasswordPage />,
       },
       {
         element: <NoAuthOnlyLayout redirectPath="/home" />,
@@ -91,5 +96,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <RouterProvider router={router} />
       </PersistGate>
     </Provider>
-  </>
+  </>,
 );

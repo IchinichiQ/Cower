@@ -25,7 +25,7 @@ const validate = (values: FormValues) => {
   if (!values.password.length) {
     errors.password = 'Поле обязательно';
   } else if (values.password.length < 8) {
-    errors.password = 'Пароль должен содержать минимум 8 символов';
+    errors.password = "Пароль должен содержать минимум 8 символов";
   }
 
   return errors;
