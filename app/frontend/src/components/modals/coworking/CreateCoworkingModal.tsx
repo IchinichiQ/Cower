@@ -5,6 +5,7 @@ import { baseUrl } from "@/api";
 import { workingDays } from "@/types/WorkingDays";
 import { colors } from "@/styles/constants";
 import { hourOptions, minuteOptions } from "@/constants/timeOptions";
+import { weekdayLabels } from "@/constants/weekdayLabels";
 
 interface Props {
   open: boolean;
@@ -96,7 +97,9 @@ export const CreateCoworkingModal: FC<Props> = ({ close, onSubmit, open }) => {
       <Flex style={{ marginBlock: 20 }} vertical gap={5}>
         {workingTime.map(({ day, open, close }) => (
           <Flex gap={5} align="center" key={day}>
-            <span style={{ width: 100 }}>{day}</span>
+            <span style={{ width: 100 }}>
+              {weekdayLabels[day as keyof typeof weekdayLabels]}
+            </span>
 
             <Select
               value={Number(open.split(":")[0])}

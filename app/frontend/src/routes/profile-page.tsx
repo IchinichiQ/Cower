@@ -50,9 +50,9 @@ export const ProfilePage = () => {
         baseUrl + "/v1/users/me",
         Object.fromEntries(
           Object.entries(info).filter(
-            ([key, value]) => user[key as keyof typeof user] !== value,
-          ),
-        ),
+            ([key, value]) => user[key as keyof typeof user] !== value
+          )
+        )
       )
       .then((res) => {
         if (res.status === 200) {
@@ -187,7 +187,7 @@ export const ProfilePage = () => {
               disabled={Object.keys(info).every(
                 (key) =>
                   user[key as keyof typeof user] ===
-                  info[key as keyof typeof info],
+                  info[key as keyof typeof info]
               )}
               onClick={handleSave}
             >
