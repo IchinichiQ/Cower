@@ -15,7 +15,6 @@ import { Coworking, Floor, Seat } from "@/types/Coworking";
 import { StyledSelect } from "@/components/ui/StyledSelect";
 import { ErrorText } from "@/styles/styles";
 import { baseUrl } from "@/api";
-import ym from "react-yandex-metrika";
 import locale from "antd/es/locale/ru_RU";
 import { MapLoader } from "@/components/ui/MapLoader";
 import { UserRole } from "@/types/User";

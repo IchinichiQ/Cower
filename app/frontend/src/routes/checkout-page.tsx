@@ -6,6 +6,7 @@ import axios from "axios";
 import { useState } from "react";
 import { ErrorText } from "@/styles/styles";
 import { baseUrl } from "@/api";
+import ym from "react-yandex-metrika";
 
 export const CheckoutPage = () => {
   const { order } = useAppSelector((state) => state.order);
@@ -40,6 +41,7 @@ export const CheckoutPage = () => {
       })
       .then((res) => {
         window.open(res.data.booking.paymentUrl, "_self");
+        ym("reachGoal", "create_order");
       })
       .catch((e) => {
         if (e.response) {
