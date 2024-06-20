@@ -1,5 +1,6 @@
 using Cower.Data.Models;
 using Cower.Domain.Models.Booking;
+using Cower.Service.Services.Implementation;
 
 namespace Cower.Service.Extensions;
 
@@ -15,6 +16,10 @@ internal static class BookingDalExt
             bookingDal.Payment.IsCompleted,
             bookingDal.Payment.ExpireAt) : null;
 
+        decimal? initialPrice = bookingDal.IsDiscountApplied
+            ? Math.Ceiling(bookingDal.Price / BookingService.DISCOUNT_COEFFICIENT)
+            : null;
+        
         return new Booking(
             bookingDal.Id,
             bookingDal.User.ToUser(),
@@ -29,6 +34,7 @@ internal static class BookingDalExt
             bookingDal.Floor,
             bookingDal.CoworkingAddress,
             payment,
-            bookingDal.IsDiscountApplied);
+            bookingDal.IsDiscountApplied,
+            initialPrice);
     }
 }

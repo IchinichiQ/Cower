@@ -66,9 +66,19 @@ builder.WebHost.UseKestrel(kestrel =>
     var pfxFilePath = "certificate.pfx";
     var pfxPassword = Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD");
 
+    bool useHttps = !string.IsNullOrEmpty(pfxPassword);
+    if (!useHttps)
+    {
+        Log.Warning("HTTPS is disabled. To enable it, set the CERTIFICATE_PASSWORD environment variable.");
+    }
+    
     kestrel.Listen(IPAddress.Any, 8080, listenOptions => {
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-        listenOptions.UseHttps(pfxFilePath, pfxPassword);
+
+        if (useHttps)
+        {
+            listenOptions.UseHttps(pfxFilePath, pfxPassword);
+        }
     });
 });
 
@@ -127,6 +137,23 @@ builder.Services.AddHostedService<UpdateInProgressStatusHostedService>();
 builder.Services.AddHostedService<UpdateSuccessStatusHostedService>();
 
 var app = builder.Build();
+
+// Apply migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    
+    try
+    {
+        var context = services.GetRequiredService<ApplicationContext>();
+        context.Database.Migrate();
+        Log.Information("Migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Log.Error($"An error occurred while applying migrations: {ex.Message}");
+    }
+}
 
 app.UseExceptionHandler(new ExceptionHandlerOptions 
 {

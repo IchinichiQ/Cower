@@ -23,7 +23,8 @@ internal static class BookingExt
             SeatNumber = booking.SeatNumber,
             Floor = booking.Floor,
             CoworkingAddress = booking.CoworkingAddress,
-            IsDiscountApplied = booking.IsDiscountApplied
+            IsDiscountApplied = booking.IsDiscountApplied,
+            InitialPrice = booking.InitialPrice
         };
     }
 }

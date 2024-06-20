@@ -28,15 +28,14 @@ COPY --from=build /app/dist /usr/local/apache2/htdocs
 
 # Use ssl
 RUN { \
-    echo "LoadModule               ssl_module modules/mod_ssl.so"; \
-    echo "SSLEngine                on"; \
-    echo "SSLCertificateFile       /etc/ssl/cower/certificate.crt"; \
-    echo "SSLCertificateKeyFile    /etc/ssl/cower/private.key"; \
-    echo "SSLCertificateChainFile  /etc/ssl/cower/ca_bundle.crt"; \
-} | tee -a /usr/local/apache2/conf/httpd.conf
-
-RUN { \
     echo '#!/bin/sh';  \
+    echo 'if [ -f /cower/ssl/certificate.crt ]; then'; \
+    echo '  echo "LoadModule ssl_module modules/mod_ssl.so" >> /usr/local/apache2/conf/httpd.conf'; \
+    echo '  echo "SSLEngine on" >> /usr/local/apache2/conf/httpd.conf'; \
+    echo '  echo "SSLCertificateFile /cower/ssl/certificate.crt" >> /usr/local/apache2/conf/httpd.conf'; \
+    echo '  echo "SSLCertificateKeyFile /cower/ssl/private.key" >> /usr/local/apache2/conf/httpd.conf'; \
+    echo '  echo "SSLCertificateChainFile /cower/ssl/ca_bundle.crt" >> /usr/local/apache2/conf/httpd.conf'; \
+    echo 'fi'; \
     echo 'grep -rl https://replace_me_in_container /usr/local/apache2/htdocs/ | xargs sed -i "s|https://replace_me_in_container|$BACKEND_ADDRESS|g"'; \
     echo 'httpd-foreground'; \
 } > /usr/local/apache2/start
