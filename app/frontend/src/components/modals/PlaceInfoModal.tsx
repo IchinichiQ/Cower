@@ -7,10 +7,8 @@ import { useNavigate } from "react-router-dom";
 
 interface Props {
   info: PlaceInfo;
-
-  onSubmit(): void;
-
   children: ReactNode;
+  onSubmit(): void;
 }
 
 export const PlaceInfoModal: FC<Props> = ({ info, children, onSubmit }) => {

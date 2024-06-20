@@ -14,7 +14,18 @@ export const CheckoutPage = () => {
   const { address, date, place, timeFrom, timeTo, price, seatId } = order!;
 
   const [isStudent, setIsStudent] = useState(false);
-  const initialPrice = price * (timeTo - timeFrom);
+
+  const spFrom = timeFrom.split(":");
+  const spTo = timeTo.split(":");
+  const hourFrom = +spFrom[0];
+  const minuteFrom = +spFrom[1];
+  const hourTo = +spTo[0];
+  const minuteTo = +spTo[1];
+  const tFrom = hourFrom * 60 + minuteFrom;
+  const tTo = hourTo * 60 + minuteTo;
+  const timeDelta = (tTo - tFrom) / 60;
+
+  const initialPrice = Math.floor(price * timeDelta);
   const finalPrice = isStudent ? Math.floor(initialPrice * 0.9) : initialPrice;
 
   const handleSubmit = () => {
@@ -23,9 +34,9 @@ export const CheckoutPage = () => {
       .post(`${baseUrl}/v1/bookings`, {
         seatId,
         bookingDate: date,
-        startTime: `${String(timeFrom).padStart(2, "0")}:00`,
-        endTime: `${String(timeTo).padStart(2, "0")}:00`,
-        isStudent,
+        startTime: timeFrom,
+        endTime: timeTo,
+        applyDiscount: isStudent,
       })
       .then((res) => {
         window.open(res.data.booking.paymentUrl, "_self");
@@ -64,8 +75,8 @@ export const CheckoutPage = () => {
           </label>
         </Flex>
         <Button onClick={handleSubmit}>Оплатить заказ</Button>
-        {errors.map((error) => (
-          <ErrorText>{error}</ErrorText>
+        {errors.map((error, index) => (
+          <ErrorText key={index}>{error}</ErrorText>
         ))}
       </Flex>
     </div>

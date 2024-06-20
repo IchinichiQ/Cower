@@ -1,6 +1,7 @@
 import styled, { keyframes } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+import { colors } from "@/styles/constants";
 
 const kf = keyframes`
   from {
@@ -28,8 +29,8 @@ const MapLoaderWrapper = styled("div")`
   }
 `;
 
-export const MapLoader = () => (
-  <MapLoaderWrapper>
+export const MapLoader = ({ dark = true }: { dark?: boolean }) => (
+  <MapLoaderWrapper style={!dark ? { backgroundColor: colors.light } : {}}>
     <FontAwesomeIcon fontSize={50} icon={faCircleNotch} />
   </MapLoaderWrapper>
 );
