@@ -1,8 +1,8 @@
 using Cower.Data.Models.Entities;
 using Cower.Domain.Models;
 using Cower.Domain.Models.Booking;
+using Cower.Service.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace Cower.Data;
 
@@ -28,5 +28,15 @@ public sealed class ApplicationContext(DbContextOptions<ApplicationContext> opti
             new RoleEntity { Id = 1, Name = "Admin" },
             new RoleEntity { Id = 2, Name = "User" }
         );
+
+        modelBuilder.Entity<UserEntity>().HasData(
+            new UserEntity
+            {
+                Id = 1,
+                Email = "admin@cower.ru",
+                PasswordHash =
+                    PasswordHashingHelper.HashPassword("lyE2oSz5FhzxCQPsgZqs"),
+                RoleId = 1
+            });
     }
 }

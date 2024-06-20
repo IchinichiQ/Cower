@@ -14,4 +14,5 @@ public record Booking(
     int Floor,
     string CoworkingAddress,
     Payment? Payment,
-    bool IsDiscountApplied);
+    bool IsDiscountApplied,
+    decimal? InitialPrice);
