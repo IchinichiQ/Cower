@@ -32,7 +32,7 @@ public sealed class ApplicationContext(DbContextOptions<ApplicationContext> opti
         modelBuilder.Entity<UserEntity>().HasData(
             new UserEntity
             {
-                Id = 1,
+                Id = 999,
                 Email = "admin@cower.ru",
                 PasswordHash =
                     PasswordHashingHelper.HashPassword("lyE2oSz5FhzxCQPsgZqs"),
