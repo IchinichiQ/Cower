@@ -9,7 +9,7 @@
 
 
 ### Использованные сервисы
-- [YouTrack](https://cower.youtrack.cloud/agiles/) -  Kanban-доска
+- [YouTrack](https://cower.youtrack.cloud/agiles/) - Kanban-доска и база знаний
 - [Figma](https://www.figma.com/file/lAdl4RMkU17MH4ga43bcP8/COWER?type=design) - Mockup-дизайн
 
 
@@ -32,7 +32,11 @@
   [pdf](documentation/Протокол_проведения_испытаний.pdf)
   
 ### Метрики
-[Скриншоты метрик](metrics)
+- [Скриншоты метрик](metrics)
+
+### Приложение
+- [Веб сайт](https://185.233.187.57/)
+- [Swagger бэкенда](https://185.233.187.57:8081/swagger/index.html)
 
 ## Презентации проекта
 
@@ -48,6 +52,10 @@
 
 [Видеопрезентация архитектуры фронтенда](https://youtu.be/kFqCJzGEbOM)  
 
+[Видеопрезентация итогового проекта](https://www.youtube.com/watch?v=pWtdmeWd9Xg)  
+
+[Видеогайд по использованию приложения](https://youtu.be/6ShIrcRhus4?si=YazHM6D5wZTgKBhe)  
+
 ## Запуск приложения
 Приложениe использует docker.  
 Для запуска бэкенда необходимо ввести следующую команду в папке `/app/backend`:
@@ -60,3 +68,8 @@ docker compose up -d
 - Для бэкенда добавить сертификат в формате `pfx` в папку `/app/backend/Cower.Web`, а также указать пароль от него в файле `/app/backend/.env`
 - Для фронтенда добавить файлы `certificate.crt`, `private.key` и `ca_bundle.crt` в папку `/cower/ssl` на хост машине
 
+### Данные учетной записи администратора по умолчанию
+- **Email:** admin@cower.ru
+- **Пароль:** `lyE2oSz5FhzxCQPsgZqs`
+
+Настоятельно рекомендуем сменить пароль администратора при первом входе.
